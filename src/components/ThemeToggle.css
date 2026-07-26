@@ -1,0 +1,20 @@
+.theme-toggle {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.theme-toggle__icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.5);
+  transition: opacity 0.25s var(--ease), transform 0.35s var(--ease);
+}
+
+.theme-toggle__icon[data-visible='true'] {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}

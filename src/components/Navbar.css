@@ -1,0 +1,84 @@
+.navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  background: transparent;
+  transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.navbar--scrolled {
+  background: var(--overlay);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-light);
+  box-shadow: 0 2px 12px var(--shadow);
+}
+
+.navbar__inner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-6);
+}
+
+.navbar__logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--fg);
+  white-space: nowrap;
+}
+.navbar__logo span { color: var(--accent-primary); }
+
+.navbar__links {
+  display: flex;
+  gap: var(--sp-8);
+  flex: 1;
+  justify-content: center;
+}
+.navbar__links a {
+  position: relative;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--fg-secondary);
+  transition: color 0.15s ease;
+  padding-bottom: 4px;
+}
+.navbar__links a::after {
+  content: '';
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 0; height: 2px;
+  background: var(--accent-primary);
+  transition: width 0.2s var(--ease);
+}
+.navbar__links a:hover { color: var(--fg); }
+.navbar__links a:hover::after { width: 100%; }
+
+.navbar__actions { display: flex; align-items: center; gap: var(--sp-3); flex-shrink: 0; }
+.navbar__cta { flex-shrink: 0; }
+.navbar__burger { display: none; }
+
+.navbar__mobile {
+  position: absolute;
+  top: var(--header-h);
+  left: 0; right: 0;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-4) var(--sp-6) var(--sp-6);
+  gap: var(--sp-4);
+  box-shadow: 0 12px 24px var(--shadow);
+  animation: fade-slide-down 0.2s var(--ease);
+}
+.navbar__mobile a { font-weight: 500; color: var(--fg); padding: var(--sp-2) 0; }
+
+@media (max-width: 860px) {
+  .navbar__links, .navbar__cta { display: none; }
+  .navbar__burger { display: inline-flex; }
+}
