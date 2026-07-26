@@ -1,30 +1,98 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Padhai.pk — Padhna ho ya Padhana, Sirf Padhai.pk pr aana</title>
-    <meta name="description" content="Padhai.pk is a global tutor marketplace built for Pakistan's students and teachers, wherever they are. Post what you need to learn, hire a verified teacher, and get paid to teach — join the waitlist." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link rel="icon" type="image/png" href="logo.jpeg" />
-  <script>
-      // Set the theme before React mounts so there's no flash of the wrong
-      // theme. Defaults to dark unless the person previously chose light.
-      (function () {
-        try {
-          var saved = localStorage.getItem('padhai-theme');
-          var theme = saved === 'light' ? 'light' : 'dark';
-          document.documentElement.setAttribute('data-theme', theme);
-        } catch (e) {
-          document.documentElement.setAttribute('data-theme', 'dark');
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Padhai.pk — Pakistan's Tutor Marketplace | Padhna ho ya Padhana</title>
+  <meta name="description" content="Padhai.pk is Pakistan's tutor marketplace connecting students with verified teachers across 67+ subjects. Post what you want to learn, get proposals, pay safely via JazzCash, EasyPaisa or card — held in escrow until your session is done. Join the waitlist free." />
+  <meta name="keywords" content="Padhai.pk, tutor marketplace Pakistan, online tuition Pakistan, find a tutor, FSc Chemistry tutor, MDCAT prep, Python tutor Pakistan, JazzCash tutoring payment, verified teacher Pakistan" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="canonical" href="https://padhai.pk/" />
+  <link rel="icon" type="image/png" href="logo.jpeg" />
+
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Padhai.pk" />
+  <meta property="og:title" content="Padhai.pk — Padhna ho ya Padhana, Sirf Padhai.pk pr aana" />
+  <meta property="og:description" content="Pakistan's tutor marketplace: verified teachers, escrow-protected payments, 67+ subjects. Join the waitlist." />
+  <meta property="og:url" content="https://padhai.pk/" />
+  <meta property="og:image" content="https://padhai.pk/og-image.png" />
+  <meta property="og:locale" content="en_PK" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Padhai.pk — Pakistan's Tutor Marketplace" />
+  <meta name="twitter:description" content="Verified teachers, escrow-protected payments, 67+ subjects. Join the waitlist." />
+  <meta name="twitter:image" content="https://padhai.pk/og-image.png" />
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- JSON-LD structured data: helps Google rich results AND is exactly the
+       kind of clean, factual block AI answer engines (Gemini, ChatGPT,
+       Perplexity) parse to cite a source accurately. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Padhai.pk",
+    "url": "https://padhai.pk",
+    "description": "Padhai.pk is Pakistan's tutor marketplace connecting students with verified teachers across 67+ subjects, with escrow-protected payments via JazzCash, EasyPaisa, and card.",
+    "areaServed": "PK",
+    "sameAs": []
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What exactly is Padhai.pk?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A tutor marketplace where students post what they want to learn, verified teachers send proposals, and paid sessions happen inside the app over video, with payment held safely until the session is confirmed complete."
         }
-      })();
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
-</html>
+      },
+      {
+        "@type": "Question",
+        "name": "Is the Padhai.pk Verified Badge really free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. CNIC and qualification verification plus a short interview is free for the first two teachers per subject, a value of Rs. 3,000, including a featured profile for 3 months."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What payment methods does Padhai.pk support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "JazzCash, EasyPaisa, and card payments, held in escrow and released to the teacher only after the session is confirmed complete."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does Padhai.pk only support Pakistan?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Padhai.pk is built for Pakistani students and teachers, priced in PKR, but the waitlist is open to anyone anywhere, including Pakistanis abroad."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('padhai-theme');
+        var theme = saved === 'light' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>

@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# Common AI/answer-engine crawlers — explicitly allowed so Gemini,
+# ChatGPT, and Perplexity can index and cite this page.
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+Sitemap: https://padhai.pk/sitemap.xml

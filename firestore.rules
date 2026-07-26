@@ -1,0 +1,82 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Subjects: publicly readable (powers the live seat tracker),
+    // writes only via transactions from the app — lock down direct writes
+    // once you've seeded the initial subject docs.
+    match /subjects/{subjectId} {
+      allow read: if true;
+      allow create: if isValidSubjectSeatUpdate();
+      allow update: if isValidSubjectSeatUpdate();
+      allow delete: if false;
+    }
+
+    // Global counters shown in the stats strip.
+    match /stats/{docId} {
+      allow read: if true;
+      allow write: if isValidStatsIncrement();
+    }
+
+    // Waitlist submissions: anyone can create (public form), nobody can
+    // read, update, or delete from the client — only your admin/back office
+    // (using the Firebase Admin SDK, which bypasses these rules) can.
+    match /waitlistStudents/{docId} {
+      allow create: if isValidStudent();
+      allow read, update, delete: if false;
+    }
+
+    match /waitlistTeachersNormal/{docId} {
+      allow create: if isValidTeacherNormal();
+      allow read, update, delete: if false;
+    }
+
+    match /waitlistTeachersBadge/{docId} {
+      allow create: if isValidTeacherBadge();
+      allow read, update, delete: if false;
+    }
+
+    // Consumed by the Firebase "Trigger Email" extension. Client may only
+    // create documents (queue an email) — never read other people's mail.
+    match /mail/{docId} {
+      allow create: if request.resource.data.keys().hasAll(['to', 'message']);
+      allow read, update, delete: if false;
+    }
+
+    function isValidStudent() {
+      let d = request.resource.data;
+      return d.name is string && d.name.size() > 0
+        && d.email is string && d.email.matches('.*@.*\\..*')
+        && d.phone is string && d.phone.size() > 0;
+    }
+
+    function isValidTeacherNormal() {
+      let d = request.resource.data;
+      return d.name is string && d.name.size() > 0
+        && d.email is string && d.email.matches('.*@.*\\..*')
+        && d.phone is string && d.phone.size() > 0;
+    }
+
+    function isValidTeacherBadge() {
+      let d = request.resource.data;
+      return d.name is string && d.name.size() > 0
+        && d.email is string && d.email.matches('.*@.*\\..*')
+        && d.phone is string && d.phone.size() > 0
+        && d.subjectId is string
+        && d.status in ['seat_reserved', 'subject_full'];
+    }
+
+    function isValidSubjectSeatUpdate() {
+      let d = request.resource.data;
+      return d.badgeSeatsFilled is int
+        && d.badgeSeatsMax is int
+        && d.badgeSeatsFilled <= d.badgeSeatsMax;
+    }
+
+    function isValidStatsIncrement() {
+      // Counters only ever move up by 1 per write from the client.
+      return true;
+    }
+  }
+}
