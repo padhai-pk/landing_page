@@ -1,0 +1,31 @@
+.floating-icons {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.floating-icons__item {
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  transform: rotate(var(--rotate));
+  animation: float var(--duration) ease-in-out infinite;
+  animation-delay: var(--delay);
+  /* Darker, more visible tint in light mode; the soft accent green in dark
+     mode. Opacity bumped up so icons read clearly instead of disappearing
+     into the background. */
+  color: var(--blue);
+  opacity: 0.16;
+}
+
+[data-theme='dark'] .floating-icons__item {
+  color: var(--accent-primary);
+  opacity: 0.22;
+}
+
+/* Hide on small screens — they'd otherwise collide with stacked content. */
+@media (max-width: 900px) {
+  .floating-icons { display: none; }
+}

@@ -1,16 +1,29 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, X, ChevronDown, Check } from 'lucide-react';
+import useDropdownPlacement from '../hooks/useDropdownPlacement.js';
 import './SubjectPicker.css';
 
+// A searchable, filterable multi-select for choosing subjects out of 60+
+// options. The panel renders through a portal (see useDropdownPlacement)
+// so it always draws above later page content instead of being trapped
+// behind whichever section comes next in the DOM.
 export default function SubjectPicker({ subjects, value, onChange, categories }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const rootRef = useRef(null);
+  const triggerRef = useRef(null);
+  const { style, placement } = useDropdownPlacement(open, triggerRef, 380);
 
   useEffect(() => {
     function onClickOutside(e) {
-      if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false);
+      if (
+        rootRef.current && !rootRef.current.contains(e.target) &&
+        !e.target.closest('.subject-picker__panel')
+      ) {
+        setOpen(false);
+      }
     }
     document.addEventListener('mousedown', onClickOutside);
     return () => document.removeEventListener('mousedown', onClickOutside);
@@ -48,6 +61,7 @@ export default function SubjectPicker({ subjects, value, onChange, categories })
 
       <button
         type="button"
+        ref={triggerRef}
         className="subject-picker__trigger"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -57,8 +71,8 @@ export default function SubjectPicker({ subjects, value, onChange, categories })
         <ChevronDown size={16} className={`subject-picker__chevron ${open ? 'is-open' : ''}`} />
       </button>
 
-      {open && (
-        <div className="subject-picker__panel">
+      {open && style && createPortal(
+        <div className={`subject-picker__panel subject-picker__panel--${placement}`} style={style}>
           <div className="subject-picker__search">
             <Search size={16} />
             <input
@@ -103,7 +117,8 @@ export default function SubjectPicker({ subjects, value, onChange, categories })
               );
             })}
           </ul>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

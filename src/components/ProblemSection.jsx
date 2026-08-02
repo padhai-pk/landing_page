@@ -1,56 +1,51 @@
 import React from 'react';
-import { UserRound, Lightbulb, Unlink } from 'lucide-react';
 import Reveal from './Reveal.jsx';
+import FloatingIcons from './FloatingIcons.jsx';
+import { useContent } from '../lib/content.jsx';
+import { getIcon } from '../lib/icons.js';
 import './ProblemSection.css';
 
-const CARDS = [
-  {
-    icon: <UserRound size={22} />,
-    who: 'Ali, 17 — needs a teacher',
-    tag: 'The learner',
-    text: "Appearing in FSc Pre-Medical. His academy wants Rs. 4,000/month — money his family doesn't have. A tutor from a Facebook group took his father's advance and never came back.",
-  },
-  {
-    icon: <Lightbulb size={22} />,
-    who: 'Fatima, 21 — has the answer',
-    tag: 'The teacher',
-    text: 'Tops her class in Python and Web Dev. Already tutors two juniors for free — no trustworthy place to list herself, no safe way to get paid, no proof of her track record.',
-  },
-  {
-    icon: <Unlink size={22} />,
-    who: 'The gap between them',
-    tag: 'No trust layer',
-    text: "They're a five-minute conversation apart. But nothing verifies either side, protects payment, or holds anyone accountable — so both stay stuck.",
-  },
+const BG_ICONS = [
+  { icon: 'BookOpen', top: '8%', left: '4%', size: 58, delay: 0, duration: 8, rotate: -8 },
+  { icon: 'Notebook', top: '14%', left: '88%', size: 48, delay: 1.2, duration: 9, rotate: 10 },
+  { icon: 'PencilRuler', top: '80%', left: '8%', size: 44, delay: 0.6, duration: 7.5, rotate: 14 },
+  { icon: 'Lightbulb', top: '70%', left: '90%', size: 40, delay: 0.9, duration: 8, rotate: -6 },
 ];
 
 export default function ProblemSection() {
+  const content = useContent();
+  const { eyebrow, heading, body, cards } = content.problem;
+
   return (
     <section className="section problem">
+      <FloatingIcons items={BG_ICONS} />
       <div className="container">
         <Reveal>
           <div className="problem__head">
-            <div className="eyebrow">The problem</div>
-            <h2>Pakistan's tutoring economy runs on trust.<br />Nothing is built to protect it.</h2>
-            <p>
-              25.1 million Pakistani children are out of school, and the private tutoring market that fills the
-              gap is almost entirely informal — WhatsApp groups, paper ads, word of mouth. No verification.
-              No escrow. No accountability when it goes wrong.
-            </p>
+            <div className="eyebrow">{eyebrow}</div>
+            <h2>{heading.split('\n').map((line, i) => <React.Fragment key={i}>{line}<br /></React.Fragment>)}</h2>
+            <p>{body}</p>
           </div>
         </Reveal>
 
         <div className="problem__grid">
-          {CARDS.map((c, i) => (
-            <Reveal key={c.who} delay={i * 100}>
-              <article className="problem__card">
-                <span className="problem__icon">{c.icon}</span>
-                <span className="problem__tag">{c.tag}</span>
-                <h4>{c.who}</h4>
-                <p>{c.text}</p>
-              </article>
-            </Reveal>
-          ))}
+          {cards.map((c, i) => {
+            const Icon = getIcon(c.icon);
+            return (
+              <Reveal key={c.who} delay={i * 100}>
+                <article className="problem__card">
+                  <div className="problem__card-head">
+                    <span className="problem__icon"><Icon size={22} /></span>
+                    <div className="problem__card-heading">
+                      <span className="problem__tag">{c.tag}</span>
+                      <h4>{c.who}</h4>
+                    </div>
+                  </div>
+                  <p>{c.text}</p>
+                </article>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>

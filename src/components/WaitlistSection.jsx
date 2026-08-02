@@ -1,24 +1,26 @@
 import React, { useState } from 'react';
-import { GraduationCap, Users, Award, Loader2 } from 'lucide-react';
+import { GraduationCap, Users, Award, Loader2, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Reveal from './Reveal.jsx';
 import SubjectPicker from './SubjectPicker.jsx';
+import CountryCitySelect from './CountryCitySelect.jsx';
+import { useContent } from '../lib/content.jsx';
 import './WaitlistSection.css';
 import { SUBJECTS, CATEGORIES } from '../lib/subjects.js';
-import { joinStudentWaitlist, joinTeacherNormalWaitlist, joinTeacherBadgeWaitlist } from '../lib/waitlist.js';
+import { joinStudentWaitlist, joinTeacherNormalWaitlist } from '../lib/waitlist.js';
 
 const TABS = [
   { id: 'student', label: 'Join as student', icon: <Users size={16} /> },
   { id: 'teacher', label: 'Join as teacher', icon: <GraduationCap size={16} /> },
-  { id: 'badge', label: 'Claim a badge seat', icon: <Award size={16} /> },
 ];
 
-const emptyForm = { name: '', email: '', phone: '', city: '', experience: '', qualification: '' };
+const emptyForm = { name: '', email: '', phone: '', country: '', city: '', experience: '' };
 
 export default function WaitlistSection({ subjects, onResult }) {
+  const content = useContent();
   const [tab, setTab] = useState('student');
   const [form, setForm] = useState(emptyForm);
   const [chosenSubjects, setChosenSubjects] = useState([]);
-  const [badgeSubject, setBadgeSubject] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -36,7 +38,6 @@ export default function WaitlistSection({ subjects, onResult }) {
     setError('');
     setForm(emptyForm);
     setChosenSubjects([]);
-    setBadgeSubject('');
   }
 
   async function handleSubmit(e) {
@@ -47,12 +48,8 @@ export default function WaitlistSection({ subjects, onResult }) {
       setError('Please fill in your name, email, and phone number.');
       return;
     }
-    if (tab !== 'badge' && chosenSubjects.length === 0) {
+    if (chosenSubjects.length === 0) {
       setError('Pick at least one subject.');
-      return;
-    }
-    if (tab === 'badge' && !badgeSubject) {
-      setError('Choose the subject you want to teach.');
       return;
     }
 
@@ -61,28 +58,12 @@ export default function WaitlistSection({ subjects, onResult }) {
       if (tab === 'student') {
         await joinStudentWaitlist({ ...form, subjects: chosenSubjects });
         onResult({ type: 'success', title: "You're on the list!", body: "We'll email you the moment Padhai.pk goes live for you." });
-      } else if (tab === 'teacher') {
+      } else {
         await joinTeacherNormalWaitlist({ ...form, subjects: chosenSubjects });
         onResult({ type: 'success', title: "You're on the list!", body: 'Look out for an invite to onboard as one of our first verified teachers.' });
-      } else {
-        const result = await joinTeacherBadgeWaitlist({ ...form, subjectId: badgeSubject });
-        if (result.status === 'seat_reserved') {
-          onResult({
-            type: 'success',
-            title: 'Seat reserved!',
-            body: `You've claimed a free Verified Badge seat for ${result.subjectName}. We'll email you next steps for the interview and document submission.`,
-          });
-        } else {
-          onResult({
-            type: 'info',
-            title: 'Both seats are taken',
-            body: `${result.subjectName} already has 2 verified teachers. You've been added to our general waitlist and we've emailed you the details.`,
-          });
-        }
       }
       setForm(emptyForm);
       setChosenSubjects([]);
-      setBadgeSubject('');
     } catch (err) {
       console.error(err);
       setError(err?.message || 'Something went wrong on our end — please try again in a moment.');
@@ -90,11 +71,6 @@ export default function WaitlistSection({ subjects, onResult }) {
       setSubmitting(false);
     }
   }
-
-  const groupedBadgeOptions = categoriesInList.map((cat) => ({
-    category: cat,
-    items: subjectList.filter((s) => s.category === cat),
-  })).filter((g) => g.items.length);
 
   return (
     <section id="waitlist" className="section waitlist">
@@ -124,11 +100,17 @@ export default function WaitlistSection({ subjects, onResult }) {
               ))}
             </div>
 
-            {tab === 'badge' && (
-              <p className="waitlist__note">
-                <Award size={15} /> Free CNIC + qualification verification, a short interview, and a badge
-                worth Rs. 3,000 — limited to the first 2 teachers per subject.
-              </p>
+            {tab === 'teacher' && (
+              <div className="waitlist__badge-promo">
+                <span className="waitlist__badge-promo-icon"><Award size={20} /></span>
+                <div className="waitlist__badge-promo-text">
+                  <strong>Verified Badges are free for the first teachers on each subject.</strong>
+                  <p>{content.badgeProgram.body}</p>
+                </div>
+                <Link to="/badge-application" className="btn btn-secondary-outline btn-sm waitlist__badge-promo-btn">
+                  Claim a free badge <ArrowRight size={15} />
+                </Link>
+              </div>
             )}
 
             <form onSubmit={handleSubmit} className="waitlist__form">
@@ -138,67 +120,36 @@ export default function WaitlistSection({ subjects, onResult }) {
                   <input value={form.name} onChange={(e) => update('name', e.target.value)} placeholder="Fatima Ahmed" required />
                 </label>
                 <label>
-                  City / country
-                  <input value={form.city} onChange={(e) => update('city', e.target.value)} placeholder="Karachi, Pakistan" />
-                </label>
-              </div>
-
-              <div className="waitlist__row">
-                <label>
                   Email
                   <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} placeholder="you@email.com" required />
                 </label>
-                <label>
-                  WhatsApp / phone
-                  <input value={form.phone} onChange={(e) => update('phone', e.target.value)} placeholder="+92 3XX-XXXXXXX" required />
-                </label>
               </div>
 
-              {tab === 'badge' ? (
-                <>
-                  <label className="waitlist__full">
-                    Subject you want to teach
-                    <select value={badgeSubject} onChange={(e) => setBadgeSubject(e.target.value)} required>
-                      <option value="" disabled>Select a subject</option>
-                      {groupedBadgeOptions.map((g) => (
-                        <optgroup key={g.category} label={g.category}>
-                          {g.items.map((s) => {
-                            const full = (s.badgeSeatsFilled || 0) >= (s.badgeSeatsMax || 2);
-                            return (
-                              <option key={s.id} value={s.id} disabled={full}>
-                                {s.name} {full ? '— Full' : `— ${(s.badgeSeatsMax || 2) - (s.badgeSeatsFilled || 0)} seat(s) open`}
-                              </option>
-                            );
-                          })}
-                        </optgroup>
-                      ))}
-                    </select>
-                  </label>
+              <label className="waitlist__full">
+                WhatsApp / phone
+                <input value={form.phone} onChange={(e) => update('phone', e.target.value)} placeholder="+92 3XX-XXXXXXX" required />
+              </label>
 
-                  <div className="waitlist__row">
-                    <label>
-                      Highest qualification
-                      <input value={form.qualification} onChange={(e) => update('qualification', e.target.value)} placeholder="BSc Computer Science" />
-                    </label>
-                    <label>
-                      Years of teaching experience
-                      <input value={form.experience} onChange={(e) => update('experience', e.target.value)} placeholder="2 years" />
-                    </label>
-                  </div>
-                </>
-              ) : (
-                <div className="waitlist__full">
-                  <span className="waitlist__label-text">
-                    {tab === 'student' ? 'Subjects you want to learn' : 'Subjects you can teach'}
-                  </span>
-                  <SubjectPicker
-                    subjects={subjectList}
-                    value={chosenSubjects}
-                    onChange={setChosenSubjects}
-                    categories={categoriesInList}
-                  />
-                </div>
-              )}
+              <div className="waitlist__row">
+                <CountryCitySelect
+                  country={form.country}
+                  city={form.city}
+                  onCountryChange={(v) => update('country', v)}
+                  onCityChange={(v) => update('city', v)}
+                />
+              </div>
+
+              <div className="waitlist__full">
+                <span className="waitlist__label-text">
+                  {tab === 'student' ? 'Subjects you want to learn' : 'Subjects you can teach'}
+                </span>
+                <SubjectPicker
+                  subjects={subjectList}
+                  value={chosenSubjects}
+                  onChange={setChosenSubjects}
+                  categories={categoriesInList}
+                />
+              </div>
 
               {tab === 'teacher' && (
                 <label className="waitlist__full">
@@ -211,7 +162,7 @@ export default function WaitlistSection({ subjects, onResult }) {
 
               <button type="submit" className="btn btn-primary btn-lg waitlist__submit" disabled={submitting}>
                 {submitting && <Loader2 size={18} className="waitlist__spinner" />}
-                {submitting ? 'Submitting…' : tab === 'badge' ? 'Apply for a free badge seat' : 'Join the waitlist'}
+                {submitting ? 'Submitting…' : 'Join the waitlist'}
               </button>
             </form>
           </div>

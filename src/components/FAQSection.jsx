@@ -1,36 +1,23 @@
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import Reveal from './Reveal.jsx';
+import FloatingIcons from './FloatingIcons.jsx';
+import { useContent } from '../lib/content.jsx';
 import './FAQSection.css';
 
-const FAQS = [
-  {
-    q: 'What exactly is Padhai.pk?',
-    a: 'A tutor marketplace: students post what they want to learn, verified teachers send proposals, and paid sessions happen inside the app over video, with payment held safely until the session is confirmed complete.',
-  },
-  {
-    q: 'Is the Verified Badge really free?',
-    a: 'Yes. CNIC and qualification verification plus a short interview is completely free for the first two teachers per subject — a value of Rs. 3,000 — with a featured profile for 3 months. We monetise through optional profile boosts later, not through verification.',
-  },
-  {
-    q: 'What happens after I join the waitlist?',
-    a: "You'll get an email the moment your city and subjects are ready for launch, plus early access before we open sign-ups publicly. Badge applicants also get interview and document-submission instructions by email.",
-  },
-  {
-    q: 'Do you only support Pakistan?',
-    a: "Padhai.pk is built for Pakistani students and teachers — priced in PKR, verified by CNIC — but the waitlist is open to anyone, anywhere, including Pakistanis abroad and teachers who want to reach students back home.",
-  },
-  {
-    q: "What if my subject's badge seats are already full?",
-    a: "You're still added to our general teacher waitlist automatically, and we'll email you if a seat frees up or a new badge round opens. You can also apply again under a different subject.",
-  },
+const BG_ICONS = [
+  { icon: 'MessageCircleQuestion', top: '8%', left: '5%', size: 52, delay: 0.3, duration: 8, rotate: -8 },
+  { icon: 'BookOpen', top: '75%', left: '88%', size: 42, delay: 0.9, duration: 7, rotate: 10 },
 ];
 
 export default function FAQSection() {
+  const content = useContent();
+  const faqs = content.faqs;
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
     <section id="faq" className="section faq">
+      <FloatingIcons items={BG_ICONS} />
       <div className="container faq__inner">
         <Reveal>
           <div className="faq__head">
@@ -40,7 +27,7 @@ export default function FAQSection() {
         </Reveal>
 
         <div className="faq__list">
-          {FAQS.map((item, i) => {
+          {faqs.map((item, i) => {
             const isOpen = openIndex === i;
             return (
               <Reveal key={item.q} delay={i * 60} as="div" className="faq__item-wrap">

@@ -1,73 +1,51 @@
-# Padhai.pk — Pre-Launch Waitlist Landing Page
+# Padhai.pk — Pre-Launch Waitlist Site
 
-A React (Vite) landing page for Padhai.pk's pre-launch, connected to Firebase
-Firestore for live data: total students/teachers on the waitlist, subjects
-covered, and — the centerpiece — a **per-subject "Verified Badge" seat
-tracker** that only allows the first 2 teachers per subject to claim a free
-Rs. 3,000 verification badge, with everyone after that automatically emailed
-and routed to the general waitlist.
+A React (Vite) + Firebase landing site for Padhai.pk's pre-launch: a live
+teacher/student waitlist, a per-subject "Verified Badge" seat tracker, and
+a full badge-application page with document upload to Google Drive.
 
-## What's new in this version
+## What's in this version
 
-- **Dark mode by default**, with a light-mode toggle in the navbar. Theme is
-  set inline in `index.html` before React mounts (no flash-of-wrong-theme)
-  and persisted in `localStorage`.
-- **Outlined icons throughout** via `lucide-react` — no emoji anywhere.
-- **Scroll and entrance animations**: staggered fade-ins on every section
-  (`components/Reveal.jsx`, IntersectionObserver-based, respects
-  `prefers-reduced-motion`), an animated hero entrance, live count-up numbers
-  in the stats strip, hover micro-interactions on cards/buttons, and a
-  back-to-top button.
-- **Copy rewritten for a global audience** — no Urdu script (the brand name
-  is plain "Padhai.pk"), no "Karachi/Lahore/Islamabad only" framing. The
-  hero tagline is now *"Padhna ho ya Padhana, sirf Padhai.pk pr aana."*
-- **67 subjects**, fully driven by Firestore (`lib/subjects.js` is the
-  fallback/seed list only — see "Managing subjects" below) with a searchable
-  multi-select picker in the waitlist form and a search + category filter
-  on the seat-tracker grid.
-- **Nielsen's 10 usability heuristics**, applied concretely:
-  1. *Visibility of system status* — live seat counts, submit-button
-     loading spinner, real-time stats.
-  2. *Match with the real world* — plain-language copy, the roll-number-slip
-     metaphor for seats.
-  3. *User control & freedom* — theme toggle, dismissible toast, closable
-     mobile menu, back-to-top.
-  4. *Consistency & standards* — one button/spacing/icon system site-wide.
-  5. *Error prevention* — full subjects are disabled (not selectable) rather
-     than allowed and rejected; required fields marked; email format checked.
-  6. *Recognition over recall* — search + category filters instead of
-     scrolling 67 checkboxes.
-  7. *Flexibility & efficiency* — searchable subject picker, keyboard-
-     operable controls.
-  8. *Aesthetic & minimalist design* — one signature visual motif (the
-     seat slips), animation used to support content, not distract from it.
-  9. *Help users recover from errors* — inline, field-specific error text.
-  10. *Help & documentation* — the FAQ section.
-
-## What's inside
-
-- **Hero, problem, how-it-works, features** sections telling the Padhai.pk
-  story and MVP scope (marketplace, proposals, boosts, subscriptions, Jitsi
-  sessions, escrow, connected payouts, JazzCash/EasyPaisa/card).
-- **Teacher Seat Program** — the signature section: subject cards styled like
-  Pakistani exam roll-number slips, each with exactly 2 seats that fill in
-  live as teachers claim them.
-- **Waitlist form** — three tabs (Student / Teacher / Badge seat) writing
-  straight to Firestore, with real-time subject dropdown that disables
-  subjects once both seats are full.
-- **Live stats strip** — students waiting, teachers waiting, subjects
-  covered, badge seats claimed — all streamed from Firestore in real time.
+- **Light theme by default**, dark mode available via the navbar toggle.
+  Set inline in `index.html` before React mounts (no flash of the wrong
+  theme) and persisted in `localStorage`.
+- **Your logo** in the header and footer — drop your file in
+  `public/logo.svg` (or update `logo.src` in `public/content.json` to point
+  at a different filename/format).
+- **Scroll animations everywhere** — every section fades/slides up as it
+  enters the viewport (`src/components/Reveal.jsx`, IntersectionObserver-
+  based, respects `prefers-reduced-motion`), plus a staggered hero entrance
+  and animated count-up stats.
+- **Floating outlined background icons** — low-opacity, slowly floating
+  lucide icons (book, lightbulb, graduation cap, shield, etc.) along the
+  edges of each section, never overlapping content, hidden on small screens
+  (`src/components/FloatingIcons.jsx`).
+- **All site copy lives in `public/content.json`** — tagline, nav labels,
+  hero text, problem cards, how-it-works steps, features, FAQs, footer
+  copy, badge program policies, and demo stats. Edit that one file and
+  redeploy — no component code changes needed. `src/lib/defaultContent.js`
+  is an offline fallback used only if the fetch fails.
+- **Two waitlist tabs** (Student / Teacher) instead of three — the badge
+  program now lives inside the Teacher tab as a promo card linking to a
+  **dedicated `/badge-application` page** with the full teacher profile
+  form, document uploads, and policy acceptance.
+- **Documents upload to Google Drive**, not Firebase Storage — see
+  "Google Drive setup" below.
+- **Subjects fetched live from Firestore**, with only the **top 10
+  subjects that still have an open badge seat** rendered in a horizontal-
+  scroll strip (not all 60+) so the page stays fast regardless of how many
+  subjects exist.
+- Fixed: equal-height cards in the features grid and the seat strip,
+  stronger nav-link and hero-button contrast, hamburger menu hidden on
+  desktop, wider gap between icon and text in the problem cards.
 
 ## 1. Firebase setup
 
-1. Go to the [Firebase Console](https://console.firebase.google.com), create
-   a project (or use an existing one).
-2. **Build → Firestore Database → Create database** (start in production
-   mode — the rules below lock it down correctly).
-3. **Project settings → General → Your apps → Add app → Web**, copy the
-   config values into a `.env` file (copy `.env.example` → `.env` and fill
-   it in):
-
+1. [Firebase Console](https://console.firebase.google.com) → create/select
+   a project → **Build → Firestore Database → Create database** (production
+   mode).
+2. **Project settings → General → Your apps → Add app → Web** → copy the
+   config into `.env` (copy `.env.example` → `.env` first):
    ```
    VITE_FIREBASE_API_KEY=...
    VITE_FIREBASE_AUTH_DOMAIN=...
@@ -76,91 +54,117 @@ and routed to the general waitlist.
    VITE_FIREBASE_MESSAGING_SENDER_ID=...
    VITE_FIREBASE_APP_ID=...
    ```
-
-4. Deploy the security rules in `firestore.rules` (Console → Firestore →
-   Rules tab → paste and publish, or `firebase deploy --only firestore:rules`
-   if you use the Firebase CLI).
-
-5. **Seed the subjects collection before launch.** Unlike the previous
-   version of this app, subject documents are no longer auto-created —
-   with 67 subjects, that could otherwise leave the "seats" grid partially
-   populated. Run the one-time seed script instead:
-
+3. Deploy `firestore.rules` (Console → Firestore → Rules tab → paste →
+   Publish).
+4. **Seed subjects before launch:**
    ```bash
    npm i -D firebase-admin
    # Firebase Console → Project settings → Service accounts →
    #   Generate new private key → save as scripts/serviceAccountKey.json
    node scripts/seedSubjects.mjs
    ```
+   After seeding, add/remove subjects straight from the Firestore console,
+   or use the Python admin app in `/admin-app` (comma-separated bulk add
+   with automatic duplicate skipping).
+5. (Optional) Email notifications when a subject is full — see
+   `functions/README.md` for the no-code Firebase "Trigger Email" extension
+   setup, consuming the `mail` collection this app already writes to.
 
-   This pushes every subject in `src/lib/subjects.js` into Firestore. It's
-   safe to re-run — it never resets seats that have already been claimed.
+### Firestore schema
 
-   **After seeding, manage subjects directly in the Firebase Console**
-   (Firestore → `subjects` collection): add a document to add a subject,
-   delete one to remove it, no code changes or redeploys required. Until
-   subjects are seeded, the page falls back to showing the static list from
-   `src/lib/subjects.js` with all seats open, so local development still
-   works without Firestore configured.
+| Collection | Purpose |
+|---|---|
+| `subjects/{subjectId}` | `{ name, category, badgeSeatsFilled, badgeSeatsMax }` |
+| `waitlistStudents/{id}` | Student signups |
+| `waitlistTeachersNormal/{id}` | Teachers on the plain waitlist |
+| `waitlistTeachersBadge/{id}` | Full badge applications — profile fields, `documents: { cnicFront, cnicBack, qualificationCert }` (Drive links), `policiesAccepted`, `status: 'seat_reserved' \| 'subject_full'` |
+| `stats/global` | `{ studentsCount, teachersNormalCount, teachersBadgeCount }` |
+| `mail/{id}` | Queued for the Trigger Email extension |
 
-6. **Email notifications** ("this subject already has 2 teachers") — see
-   `functions/README.md` for the 5-minute no-code setup using the official
-   Firebase "Trigger Email" extension.
+## 2. Google Drive setup (verification documents)
 
-## 2. Run it locally
+Badge applicants upload CNIC + qualification documents on `/badge-application`.
+These go to a Vercel serverless function (`api/upload-to-drive.js`) which
+uploads them into a shared Drive folder using a service account — no
+per-teacher Google login required.
+
+1. Google Cloud Console → enable the **Google Drive API** on your project.
+2. **IAM & Admin → Service Accounts → Create service account → Create key
+   (JSON)** → download it.
+3. Create a Google Drive folder for verification documents → **Share** it
+   with the service account's email (the `client_email` in the JSON key) →
+   give it **Editor** access.
+4. Add these environment variables (Vercel → Project → Settings →
+   Environment Variables — **not** prefixed with `VITE_`, these are
+   server-only):
+   ```
+   GOOGLE_SERVICE_ACCOUNT_EMAIL   = client_email from the JSON key
+   GOOGLE_SERVICE_ACCOUNT_KEY     = private_key from the JSON key
+   GOOGLE_DRIVE_FOLDER_ID         = the folder's ID (from its URL)
+   ```
+5. Redeploy.
+
+## 3. Run locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Opens at `http://localhost:5173`.
-
-## 3. Build & deploy
+## 4. Deploy to Vercel
 
 ```bash
-npm run build
+npm i -g vercel
+vercel login
+vercel            # first deploy
+vercel --prod     # production deploy
 ```
 
-Outputs static files to `dist/`. Deploy anywhere that serves static sites —
-Firebase Hosting is the natural fit since you're already using Firestore:
+Add the `VITE_FIREBASE_*` variables (Production, Preview, Development) and
+the three `GOOGLE_*` variables above in the Vercel dashboard, then redeploy.
+`vercel.json` is already configured to serve the SPA correctly while still
+routing `/api/*` to the serverless function (not swallowed by the SPA
+fallback).
 
-```bash
-npm install -g firebase-tools
-firebase login
-firebase init hosting   # point it at the `dist` folder, configure as a SPA
-firebase deploy
-```
+Also add your Vercel domain to Firebase Console → Authentication →
+Settings → **Authorized domains**.
+
+## 5. Admin desktop app
+
+`/admin-app` is a standalone Python (Tkinter) tool for the team — see
+`admin-app/README.md`. It shows live signup counts + last-submission time,
+lets you bulk-add subjects (comma-separated, duplicate-safe), and exports
+each collection to `.xlsx`.
 
 ## Project structure
 
 ```
 src/
-  firebase.js              Firebase app + Firestore init
+  App.jsx                   Providers + routing (/ and /badge-application)
+  firebase.js                Firebase app + Firestore init
   lib/
-    subjects.js             The editable list of subjects + seat count (2/subject)
-    waitlist.js              All Firestore reads/writes (transactions, listeners)
-  components/
-    Navbar, Hero, StatsStrip, ProblemSection, HowItWorks,
-    FeaturesGrid, SeatProgram, WaitlistSection, Toast, Footer
-firestore.rules             Security rules to deploy alongside this schema
-functions/README.md         How to wire up the "subject full" email
+    content.jsx               Runtime content provider (fetches /content.json)
+    defaultContent.js          Offline fallback copy of content.json
+    icons.js                   Icon-name → lucide component lookup
+    subjects.js                Fallback/seed subject list (67 subjects)
+    theme.jsx                  Light/dark theme context
+    waitlist.js                All Firestore reads/writes
+    driveUpload.js              Client helper for /api/upload-to-drive
+  hooks/useCountUp.js          Animated number count-up
+  components/                  Navbar, Hero, StatsStrip, ProblemSection,
+                                HowItWorks, FeaturesGrid, SeatProgram,
+                                WaitlistSection, SubjectPicker, FAQSection,
+                                FloatingIcons, Reveal, Toast, BackToTop, Footer
+  pages/
+    LandingPage.jsx             The full "/" page
+    BadgeApplicationPage.jsx    The full "/badge-application" page + form
+api/
+  upload-to-drive.js          Vercel serverless function → Google Drive
+public/
+  content.json                 All editable site copy
+  logo.svg                     Placeholder — replace with your real logo
+scripts/seedSubjects.mjs       One-time Firestore subject seeding
+admin-app/                     Python desktop admin tool (separate from the site)
+firestore.rules                Security rules to deploy
+vercel.json / .vercelignore    Vercel deployment config
 ```
-
-## Firestore schema reference
-
-| Collection | Purpose |
-|---|---|
-| `subjects/{subjectId}` | `{ name, category, badgeSeatsFilled, badgeSeatsMax }` — live seat count per subject |
-| `waitlistStudents/{id}` | Student signups |
-| `waitlistTeachersNormal/{id}` | Teachers on the plain waitlist |
-| `waitlistTeachersBadge/{id}` | Badge-seat applications, `status: 'seat_reserved' \| 'subject_full'` |
-| `stats/global` | `{ studentsCount, teachersNormalCount, teachersBadgeCount }` |
-| `mail/{id}` | Queued for the Trigger Email extension when a subject is full |
-
-## Design system
-
-Colors, type, spacing, radii, and button/card styles all follow the Padhai
-Edu design tokens (`--blue #142a49`, `--green #1d8877`, `--light-green
-#12d16f`, Poppins body / Space Grotesk display) — see `src/index.css` for the
-full token set.

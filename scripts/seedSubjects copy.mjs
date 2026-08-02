@@ -1,20 +1,12 @@
 // scripts/seedSubjects.mjs
 //
-// One-time (or re-run anytime) script that pushes the subject list into
-// Firestore, so the `subjects` collection is fully populated before you
-// launch. After this runs, add/remove subjects directly in the Firebase
-// Console (Firestore → subjects) — no code changes or redeploys needed.
-//
 // Setup:
 //   npm i -D firebase-admin
 //   Firebase Console → Project settings → Service accounts →
 //     Generate new private key → save as scripts/serviceAccountKey.json
-//     (already gitignored)
 //   node scripts/seedSubjects.mjs
 //
-// Safe to re-run: uses merge writes, so it never resets seats that have
-// already been claimed — it only adds subjects that don't exist yet and
-// fills in missing name/category fields on ones that do.
+// Safe to re-run: uses merge writes, never resets seats already claimed.
 
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -33,11 +25,10 @@ const db = getFirestore();
 
 const BADGE_SEATS_PER_SUBJECT = 2;
 
-// Kept in sync with src/lib/subjects.js — copy that list here if you edit it.
 const { SUBJECTS } = await import('../src/lib/subjects.js');
 
 async function seed() {
-  const batchSize = 400; // Firestore batch write limit is 500
+  const batchSize = 400;
   let batch = db.batch();
   let count = 0;
 
@@ -49,7 +40,6 @@ async function seed() {
         name: subject.name,
         category: subject.category,
         badgeSeatsMax: BADGE_SEATS_PER_SUBJECT,
-        // Only set on first creation — merge won't overwrite an existing count.
         badgeSeatsFilled: 0,
       },
       { mergeFields: ['name', 'category', 'badgeSeatsMax'] }
@@ -62,8 +52,6 @@ async function seed() {
   }
   await batch.commit();
 
-  // Ensure badgeSeatsFilled exists on brand-new docs without ever
-  // clobbering an existing count (merge above deliberately skips it).
   const snapshot = await db.collection('subjects').get();
   const fixBatch = db.batch();
   snapshot.forEach((doc) => {

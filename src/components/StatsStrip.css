@@ -44,14 +44,8 @@
   .stats-strip__grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-.stats-strip {
-  position: relative;
-}
-
-.stats-strip__value {
-  font-variant-numeric: tabular-nums;
-}
-
+.stats-strip { position: relative; }
+.stats-strip__value { font-variant-numeric: tabular-nums; }
 .stats-strip__demo-note {
   text-align: center;
   font-size: 0.72rem;

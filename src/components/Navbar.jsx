@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle.jsx';
+import { useContent } from '../lib/content.jsx';
 import './Navbar.css';
+import { useTheme } from '../lib/theme.jsx';
 
 export default function Navbar() {
+  const content = useContent();
+  const { theme } = useTheme();
+const logoSrc = theme === 'dark' ? content.logo.srcDark : content.logo.srcLight;
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -13,31 +19,25 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const links = [
-    { href: '#how-it-works', label: 'How it works' },
-    { href: '#features', label: 'Features' },
-    { href: '#badge-program', label: 'Teacher Seats' },
-    { href: '#faq', label: 'FAQ' },
-    { href: '#waitlist', label: 'Waitlist' },
-  ];
+  const links = content.nav.links;
 
   return (
     <header className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}>
       <div className="container navbar__inner">
-        <a href="#top" className="navbar__logo">
-          Padhai<span>.pk</span>
-        </a>
+      <Link to="/" className="navbar__logo">
+  <img className="navbar__logo-img" src={logoSrc} alt={content.logo.alt} />
+</Link>
 
         <nav className="navbar__links">
           {links.map((l) => (
-            <a key={l.href} href={l.href}>{l.label}</a>
+            <a key={l.href} href={`/${l.href}`}>{l.label}</a>
           ))}
         </nav>
 
         <div className="navbar__actions">
           <ThemeToggle />
-          <a href="#waitlist" className="btn btn-primary btn-sm navbar__cta">
-            Join waitlist
+          <a href="/#waitlist" className="btn btn-primary btn-sm navbar__cta">
+            {content.nav.cta}
           </a>
           <button
             className="navbar__burger icon-btn"
@@ -53,10 +53,10 @@ export default function Navbar() {
       {open && (
         <div className="navbar__mobile">
           {links.map((l) => (
-            <a key={l.href} href={l.href} onClick={() => setOpen(false)}>{l.label}</a>
+            <a key={l.href} href={`/${l.href}`} onClick={() => setOpen(false)}>{l.label}</a>
           ))}
-          <a href="#waitlist" className="btn btn-primary btn-md" onClick={() => setOpen(false)}>
-            Join waitlist
+          <a href="/#waitlist" className="btn btn-primary btn-md" onClick={() => setOpen(false)}>
+            {content.nav.cta}
           </a>
         </div>
       )}

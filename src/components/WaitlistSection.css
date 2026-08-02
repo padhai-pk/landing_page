@@ -3,7 +3,7 @@
 .waitlist__inner { max-width: 760px; }
 
 .waitlist__head { text-align: center; margin-bottom: var(--sp-10); }
-.waitlist__head h2 { color: var(--heading); }
+.waitlist__head h2 { color: var(--heading-color); }
 
 .waitlist__card {
   background: var(--card-bg);
@@ -160,3 +160,29 @@
   .waitlist__row { grid-template-columns: 1fr; }
   .waitlist__tabs { flex-direction: column; }
 }
+
+.waitlist__badge-promo {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  background: rgba(18, 209, 111, 0.07);
+  border: 1px solid rgba(18, 209, 111, 0.25);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-5);
+  flex-wrap: wrap;
+}
+.waitlist__badge-promo-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(18, 209, 111, 0.14);
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+.waitlist__badge-promo-text { flex: 1; min-width: 200px; }
+.waitlist__badge-promo-text strong { display: block; font-size: 0.92rem; margin-bottom: 2px; }
+.waitlist__badge-promo-text p { margin: 0; font-size: 0.84rem; }
+.waitlist__badge-promo-btn { flex-shrink: 0; white-space: nowrap; }

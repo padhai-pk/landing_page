@@ -52,20 +52,22 @@
 
 .subject-picker__chevron { transition: transform 0.2s ease; flex-shrink: 0; }
 .subject-picker__chevron.is-open { transform: rotate(180deg); }
-
 .subject-picker__panel {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0; right: 0;
-  z-index: 20;
+  /* position/top/left/width/z-index now come from inline style (portal) */
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   box-shadow: 0 20px 48px var(--shadow-strong);
   padding: var(--sp-4);
+  max-height: min(400px, 70vh);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   animation: scale-in 0.16s var(--ease);
-  transform-origin: top center;
 }
+
+.subject-picker__panel--down { transform-origin: top center; }
+.subject-picker__panel--up { transform-origin: bottom center; }
 
 .subject-picker__search {
   display: flex;
@@ -76,6 +78,7 @@
   padding: 10px 12px;
   margin-bottom: var(--sp-3);
   color: var(--fg-secondary);
+  flex-shrink: 0;
 }
 .subject-picker__search input {
   border: none;
@@ -93,6 +96,7 @@
   margin-bottom: var(--sp-3);
   max-height: 66px;
   overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .subject-picker__cat {
@@ -115,7 +119,8 @@
 .subject-picker__list {
   list-style: none;
   margin: 0; padding: 0;
-  max-height: 240px;
+  flex: 1;
+  min-height: 60px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;

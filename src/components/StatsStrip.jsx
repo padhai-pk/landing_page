@@ -1,66 +1,66 @@
 import React, { useMemo } from 'react';
 import { Users, GraduationCap, BookOpen, ShieldCheck } from 'lucide-react';
 import useCountUp from '../hooks/useCountUp.js';
-import { DEMO_STATS, DEMO_SEATS_CLAIMED, DEMO_SEATS_TOTAL } from '../lib/demoData.js';
+import Reveal from './Reveal.jsx';
+import { useContent } from '../lib/content.jsx';
 import './StatsStrip.css';
 
-function StatItem({ icon, value, label, isNumeric = true }) {
+function StatItem({ icon, value, label, isNumeric = true, delay = 0 }) {
   const display = useCountUp(isNumeric ? value : 0, 1400);
   return (
-    <div className="stats-strip__item">
+    <Reveal delay={delay} className="stats-strip__item">
       <span className="stats-strip__icon">{icon}</span>
       <span className="stats-strip__value">
         {isNumeric ? display.toLocaleString('en-US') : value}
       </span>
       <span className="stats-strip__label">{label}</span>
-    </div>
+    </Reveal>
   );
 }
 
 export default function StatsStrip({ stats, subjects }) {
+  const { demoStats } = useContent();
+
+  // Firestore hasn't reported any real signups yet (fresh project, still
+  // offline, or genuinely zero so far) — show believable demo numbers
+  // instead of an empty-looking "0" strip. Swaps to live numbers the
+  // instant real data exists.
   const hasLiveData =
     (stats.studentsCount || 0) + (stats.teachersNormalCount || 0) + (stats.teachersBadgeCount || 0) > 0;
-
-  const effectiveStats = hasLiveData ? stats : DEMO_STATS;
+  const effectiveStats = hasLiveData ? stats : demoStats;
 
   const seatsClaimed = useMemo(() => {
-    if (subjects.length === 0) return DEMO_SEATS_CLAIMED;
+    if (subjects.length === 0) return demoStats.seatsClaimed;
     const claimed = subjects.reduce((sum, s) => sum + (s.badgeSeatsFilled || 0), 0);
-    return claimed > 0 ? claimed : DEMO_SEATS_CLAIMED;
-  }, [subjects]);
+    return claimed > 0 ? claimed : demoStats.seatsClaimed;
+  }, [subjects, demoStats.seatsClaimed]);
 
   const seatsTotal = useMemo(() => {
-    if (subjects.length === 0) return DEMO_SEATS_TOTAL;
+    if (subjects.length === 0) return demoStats.seatsTotal;
     return subjects.reduce((sum, s) => sum + (s.badgeSeatsMax || 0), 0);
-  }, [subjects]);
+  }, [subjects, demoStats.seatsTotal]);
 
-  const subjectCount = subjects.length || 67;
+  const subjectCount = subjects.length || Math.round(demoStats.seatsTotal / 2);
 
   return (
     <section className="stats-strip">
       <div className="container stats-strip__grid">
-        <StatItem
-          icon={<Users size={20} />}
-          value={effectiveStats.studentsCount}
-          label="Students waiting"
-        />
+        <StatItem icon={<Users size={20} />} value={effectiveStats.studentsCount} label="Students waiting" delay={0} />
         <StatItem
           icon={<GraduationCap size={20} />}
           value={effectiveStats.teachersNormalCount + effectiveStats.teachersBadgeCount}
           label="Teachers waiting"
+          delay={80}
         />
-        <StatItem
-          icon={<BookOpen size={20} />}
-          value={subjectCount}
-          label="Subjects covered"
-        />
+        <StatItem icon={<BookOpen size={20} />} value={subjectCount} label="Subjects covered" delay={160} />
         <StatItem
           icon={<ShieldCheck size={20} />}
           value={seatsClaimed}
           label={`Verified badge seats claimed (of ${seatsTotal})`}
+          delay={240}
         />
       </div>
-      {!hasLiveData && <p className="stats-strip__demo-note">Showing demo numbers until live signups come in.</p>}
+      {!hasLiveData && <p className="stats-strip__demo-note">Showing illustrative numbers until live signups come in.</p>}
     </section>
   );
 }

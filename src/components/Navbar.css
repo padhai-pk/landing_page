@@ -26,6 +26,9 @@
 }
 
 .navbar__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.4rem;
@@ -33,7 +36,14 @@
   white-space: nowrap;
 }
 .navbar__logo span { color: var(--accent-primary); }
+.navbar__logo-img {
+  height: 34px;
+  width: auto;
+  display: block;
+}
 
+/* Nav links: use --fg at reduced opacity rather than --fg-secondary so
+   contrast against the background stays strong in BOTH themes. */
 .navbar__links {
   display: flex;
   gap: var(--sp-8);
@@ -43,9 +53,10 @@
 .navbar__links a {
   position: relative;
   font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--fg-secondary);
-  transition: color 0.15s ease;
+  font-weight: 600;
+  color: var(--fg);
+  opacity: 0.72;
+  transition: opacity 0.15s ease, color 0.15s ease;
   padding-bottom: 4px;
 }
 .navbar__links a::after {
@@ -56,12 +67,18 @@
   background: var(--accent-primary);
   transition: width 0.2s var(--ease);
 }
-.navbar__links a:hover { color: var(--fg); }
+.navbar__links a:hover { opacity: 1; color: var(--accent-secondary); }
 .navbar__links a:hover::after { width: 100%; }
 
 .navbar__actions { display: flex; align-items: center; gap: var(--sp-3); flex-shrink: 0; }
 .navbar__cta { flex-shrink: 0; }
-.navbar__burger { display: none; }
+
+/* Hamburger: hidden by default (desktop). Only shown under the mobile
+   breakpoint below. Selector specificity kept high on purpose so it can't
+   be accidentally overridden by the generic .icon-btn display rule. */
+.navbar__actions .navbar__burger {
+  display: none !important;
+}
 
 .navbar__mobile {
   position: absolute;
@@ -76,9 +93,11 @@
   box-shadow: 0 12px 24px var(--shadow);
   animation: fade-slide-down 0.2s var(--ease);
 }
-.navbar__mobile a { font-weight: 500; color: var(--fg); padding: var(--sp-2) 0; }
+.navbar__mobile a { font-weight: 600; color: var(--fg); padding: var(--sp-2) 0; }
 
 @media (max-width: 860px) {
   .navbar__links, .navbar__cta { display: none; }
-  .navbar__burger { display: inline-flex; }
+  .navbar__actions .navbar__burger {
+    display: inline-flex !important;
+  }
 }

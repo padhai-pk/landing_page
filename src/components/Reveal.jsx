@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
+// Wraps children in a fade/slide-up reveal that triggers once, the first
+// time the element scrolls into view. `delay` staggers groups of siblings.
 export default function Reveal({ children, delay = 0, as: Tag = 'div', className = '' }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);

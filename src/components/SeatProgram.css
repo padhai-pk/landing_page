@@ -1,21 +1,31 @@
-.seatprog { background: var(--bg); }
-
 .seatprog__head {
   max-width: 640px;
-  margin: 0 auto var(--sp-12);
+  margin: 0 auto var(--sp-10);
   text-align: center;
 }
-.seatprog__head h2 { color: var(--heading); }
+.seatprog__head h2 { color: var(--fg); }
 
-.seatprog__grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--sp-6) var(--sp-5);
+/* Horizontal scroll strip — deliberately NOT a grid of all subjects.
+   Only ever renders up to 10 cards (filtered in JS), so this stays cheap
+   even once the Firestore `subjects` collection has 60+ documents. */
+.seatprog__scroll {
+  display: flex;
+  gap: var(--sp-5);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding: var(--sp-2) var(--sp-1) var(--sp-6);
+  margin: 0 calc(var(--sp-1) * -1);
+  -webkit-overflow-scrolling: touch;
 }
+.seatprog__scroll::-webkit-scrollbar { height: 8px; }
+.seatprog__scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: var(--r-full); }
+.seatprog__scroll::-webkit-scrollbar-track { background: transparent; }
 
 .slip {
   position: relative;
   display: flex;
+  flex: 0 0 280px;
+  scroll-snap-align: start;
   background: var(--card-bg);
   border: 1.5px dashed var(--border);
   border-radius: var(--r-md);
@@ -23,8 +33,6 @@
   transition: border-color 0.18s ease, transform 0.18s ease;
 }
 .slip:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
-
-.slip--full { border-style: solid; border-color: var(--border-light); opacity: 0.72; }
 
 .slip__perf {
   display: flex;
@@ -35,6 +43,7 @@
   background: var(--bg-secondary);
   border-right: 1.5px dashed var(--border);
   padding: var(--sp-3) 0;
+  flex-shrink: 0;
 }
 .slip__perf span {
   width: 6px; height: 6px;
@@ -43,12 +52,15 @@
   box-shadow: 0 0 0 1px var(--border) inset;
 }
 
+/* Equal height: every card is the same flex-basis width, and the body
+   fills full height with the seat row pinned to the bottom via margin-top:auto. */
 .slip__body {
   flex: 1;
   padding: var(--sp-5);
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
+  min-height: 168px;
 }
 
 .slip__category {
@@ -69,7 +81,8 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  margin-top: var(--sp-2);
+  margin-top: auto;
+  padding-top: var(--sp-2);
 }
 
 .slip__seat {
@@ -82,11 +95,13 @@
   font-size: 0.72rem;
   color: #fff;
   flex-shrink: 0;
+  transition: transform 0.15s ease;
 }
 .slip__seat--taken {
   background: var(--accent-primary);
   border-color: var(--accent-primary);
 }
+.slip:hover .slip__seat--taken { transform: scale(1.08); }
 
 .slip__seat-label {
   font-size: 0.78rem;
@@ -94,87 +109,50 @@
   margin-left: var(--sp-1);
 }
 
-.slip__stamp {
-  position: absolute;
-  top: 14px; right: -26px;
-  transform: rotate(38deg);
-  background: var(--error);
-  color: #fff;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.68rem;
-  letter-spacing: 0.12em;
-  padding: 3px 32px;
+.seatprog__empty {
+  text-align: center;
+  padding: var(--sp-8);
+  color: var(--fg-secondary);
 }
 
-.seatprog__controls {
-  max-width: 720px;
-  margin: 0 auto var(--sp-8);
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
+.seatprog__cta { text-align: center; margin-top: var(--sp-10); }
+
+@media (max-width: 560px) {
+  .slip { flex-basis: 240px; }
 }
+
 
 .seatprog__search {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
+  max-width: 420px;
+  margin: 0 auto var(--sp-8);
   border: 1px solid var(--border);
   background: var(--input-bg);
   border-radius: var(--r-full);
   padding: 12px 18px;
   color: var(--fg-secondary);
 }
+.seatprog__search:focus-within { border-color: var(--accent-primary); }
 .seatprog__search input {
+  flex: 1;
   border: none;
   background: none;
   outline: none;
-  width: 100%;
   font-size: 0.92rem;
   color: var(--fg);
 }
-
-.seatprog__categories {
-  display: flex;
-  gap: var(--sp-2);
-  flex-wrap: wrap;
+.seatprog__search-clear {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-}
-.seatprog__cat {
-  border: 1px solid var(--border);
-  background: transparent;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: var(--card-hover);
   color: var(--fg-secondary);
-  border-radius: var(--r-full);
-  padding: 7px 14px;
-  font-size: 0.78rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
-.seatprog__cat:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
-.seatprog__cat.is-active {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-  color: #06371f;
-}
-
-.seatprog__empty {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: var(--sp-8);
-  color: var(--fg-secondary);
-}
-
-.seatprog__more { display: flex; justify-content: center; margin-top: var(--sp-8); }
-
-.seatprog__cta { text-align: center; margin-top: var(--sp-12); }
-
-.slip__seat { transition: transform 0.15s ease; }
-.slip:hover .slip__seat--taken { transform: scale(1.08); }
-
-@media (max-width: 1000px) {
-  .seatprog__grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 560px) {
-  .seatprog__grid { grid-template-columns: 1fr; }
-}
+.seatprog__search-clear:hover { color: var(--fg); }

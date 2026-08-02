@@ -2,5 +2,5 @@ node_modules
 dist
 .env
 .env.local
-firebase.rules
 scripts/serviceAccountKey.json
+admin-app

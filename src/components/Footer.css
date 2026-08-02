@@ -13,12 +13,13 @@
 }
 
 .footer__logo {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.3rem;
-  color: #fff;
+  display: inline-flex;
 }
-.footer__logo span { color: var(--light-green); }
+.footer__logo-img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
 
 .footer__tagline { margin: var(--sp-1) 0 0; font-size: 0.85rem; color: rgba(248,249,250,0.65); }
 

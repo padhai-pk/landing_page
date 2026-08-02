@@ -3,12 +3,21 @@
   margin: 0 auto var(--sp-12);
   text-align: center;
 }
-.features__head h2 { color: var(--heading); }
+.features__head h2 { color: var(--fg); }
 
 .features__grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--sp-5);
+  align-items: stretch;
+}
+
+/* The Reveal wrapper is a grid item — it must stretch to the row's tallest
+   item, and the card inside it must fill that full height, or "equal
+   height cards" silently breaks the moment text lengths differ. */
+.features__reveal {
+  height: 100%;
+  display: flex;
 }
 
 .features__card {
@@ -17,6 +26,10 @@
   border-radius: var(--r-lg);
   padding: var(--sp-6);
   transition: transform 0.18s ease, box-shadow 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
 .features__card:hover {
   transform: translateY(-3px);
@@ -31,12 +44,12 @@
   border-radius: var(--r-md);
   background: linear-gradient(135deg, var(--light-green), var(--green));
   color: #fff;
-  font-size: 1.1rem;
   margin-bottom: var(--sp-4);
+  flex-shrink: 0;
 }
 
 .features__card h4 { font-size: 1.05rem; margin-bottom: var(--sp-2); }
-.features__card p { margin: 0; font-size: 0.9rem; }
+.features__card p { margin: 0; font-size: 0.9rem; flex: 1; }
 
 @media (max-width: 1000px) {
   .features__grid { grid-template-columns: repeat(2, 1fr); }

@@ -1,0 +1,8 @@
+<svg width="140" height="40" viewBox="0 0 140 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- PLACEHOLDER LOGO — replace this file with your real Padhai.pk logo.
+       Keep the filename "logo.svg" (or update logo.src in content.json)
+       and keep it reasonably wide/short so it fits the 34px-tall navbar slot. -->
+  <rect x="0" y="4" width="32" height="32" rx="8" fill="#12D16F"/>
+  <text x="9" y="27" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="18" fill="#0D141C">P</text>
+  <text x="38" y="27" font-family="Space Grotesk, sans-serif" font-weight="700" font-size="20" fill="#142A49">Padhai<tspan fill="#12D16F">.pk</tspan></text>
+</svg>
