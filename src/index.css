@@ -88,6 +88,10 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
+html, body {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -98,6 +102,7 @@ body {
   -webkit-font-smoothing: antialiased;
   transition: background 0.3s ease, color 0.3s ease;
 }
+
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
@@ -172,9 +177,20 @@ img, svg { max-width: 100%; display: block; }
 .btn-primary {
   background: linear-gradient(135deg, var(--light-green), var(--green));
   color: #fff;
-  box-shadow: 0 8px 24px rgba(18, 209, 111, 0.28);
+  box-shadow: 0 6px 16px rgba(18, 209, 111, 0.22);
 }
-.btn-primary:hover { box-shadow: 0 10px 32px rgba(18, 209, 111, 0.42); transform: translateY(-2px); }
+.btn-primary:hover { box-shadow: 0 8px 20px rgba(18, 209, 111, 0.3); transform: translateY(-2px); }
+
+/* Dark mode: flatter fill, no neon glow — reads as a solid brand button
+   rather than a lit-up CTA. */
+[data-theme='dark'] .btn-primary {
+  background: var(--green);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+[data-theme='dark'] .btn-primary:hover {
+  background: var(--light-green);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
 
 .btn-secondary {
   background: linear-gradient(135deg, var(--green), var(--dark-green));
@@ -197,10 +213,16 @@ img, svg { max-width: 100%; display: block; }
   color: var(--accent-secondary);
 }
 [data-theme='dark'] .btn-secondary-outline {
-  background: rgba(18, 209, 111, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--fg-secondary);
+  color: var(--fg);
+}
+[data-theme='dark'] .btn-secondary-outline:hover {
   border-color: var(--accent-primary);
   color: var(--accent-primary);
+  background: rgba(255, 255, 255, 0.06);
 }
+
 .btn-secondary-outline:hover {
   background: rgba(29, 136, 119, 0.16);
   transform: translateY(-2px);
@@ -237,9 +259,9 @@ img, svg { max-width: 100%; display: block; }
   color: transparent;
 }
 [data-theme='dark'] .text-gradient {
-  background: linear-gradient(90deg, var(--light-green), var(--green), #6fa8ff);
-  -webkit-background-clip: text;
-  background-clip: text;
+  background: none;
+  -webkit-text-fill-color: var(--light-green);
+  color: var(--light-green);
 }
 
 .section { padding: var(--sp-24) 0; position: relative; }

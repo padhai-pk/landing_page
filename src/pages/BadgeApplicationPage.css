@@ -2,6 +2,7 @@
   padding: calc(var(--header-h) + var(--sp-10)) 0 var(--sp-20);
   background: var(--bg-secondary);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .badgepage__inner { max-width: 980px; }
@@ -61,6 +62,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--sp-4);
+  min-width: 0;
+}
+.badgepage__row > * {
+  min-width: 0;
 }
 
 .badgepage__form label,
@@ -83,14 +88,18 @@
   font-size: 0.92rem;
   color: var(--fg);
   font-family: inherit;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
+
 .badgepage__form input:focus,
 .badgepage__form select:focus,
 .badgepage__form textarea:focus { border-color: var(--accent-primary); outline: none; }
 
 .badgepage__full { grid-column: 1 / -1; }
 .badgepage__doc-note { margin: -8px 0 0; font-size: 0.8rem; }
-
 .badgepage__file-drop {
   display: flex;
   align-items: center;
@@ -102,7 +111,21 @@
   color: var(--fg-secondary);
   cursor: pointer;
   position: relative;
+  min-width: 0;
 }
+.badgepage__file-drop svg { flex-shrink: 0; }
+
+/* This was the actual cause of the page "zooming out" on mobile: a long
+   selected filename with no truncation forced this row (and everything
+   around it) wider than the viewport. */
+.badgepage__file-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .badgepage__file-drop:hover { border-color: var(--accent-primary); }
 .badgepage__file-drop.has-file { border-style: solid; border-color: var(--accent-primary); color: var(--accent-secondary); }
 .badgepage__file-drop input[type='file'] {

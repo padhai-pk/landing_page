@@ -44,6 +44,13 @@ service cloud.firestore {
       allow read, update, delete: if false;
     }
 
+// Written only by the upload-to-drive serverless function via the
+    // Admin SDK (which bypasses these rules entirely) — this just makes
+    // the intent explicit and blocks any client-side access.
+    match /uploadRateLimits/{docId} {
+      allow read, write: if false;
+    }
+    
     function isValidStudent() {
       let d = request.resource.data;
       return d.name is string && d.name.size() > 0

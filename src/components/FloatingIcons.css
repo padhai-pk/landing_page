@@ -25,7 +25,9 @@
   opacity: 0.22;
 }
 
-/* Hide on small screens — they'd otherwise collide with stacked content. */
 @media (max-width: 900px) {
-  .floating-icons { display: none; }
+  .floating-icons__item { transform: scale(0.55) rotate(var(--rotate)); }
+}
+@media (max-width: 560px) {
+  .floating-icons__item { transform: scale(0.4) rotate(var(--rotate)); }
 }

@@ -7,8 +7,9 @@ import CountryCitySelect from '../components/CountryCitySelect.jsx';
 import { useContent } from '../lib/content.jsx';
 import { SUBJECTS, CATEGORIES, BADGE_SEATS_PER_SUBJECT } from '../lib/subjects.js';
 import { listenToSubjects, joinTeacherBadgeWaitlist } from '../lib/waitlist.js';
-import { uploadFileToDrive } from '../lib/driveUpload.js';
 import './BadgeApplicationPage.css';
+import { uploadFileToDrive } from '../lib/driveUpload.js';
+import { validateDocFile, ACCEPTED_DOC_INPUT_ATTR } from '../lib/fileValidation.js';
 
 const emptyForm = {
   name: '', email: '', phone: '', country: '', city: '', cnicNumber: '',
@@ -49,9 +50,20 @@ export default function BadgeApplicationPage() {
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
   }
-
   function updateFile(field, fileList) {
-    setFiles((f) => ({ ...f, [field]: fileList?.[0] || null }));
+    const file = fileList?.[0] || null;
+    if (!file) {
+      setFiles((f) => ({ ...f, [field]: null }));
+      return;
+    }
+    const check = validateDocFile(file);
+    if (!check.valid) {
+      setError(check.reason);
+      setFiles((f) => ({ ...f, [field]: null }));
+      return;
+    }
+    setError('');
+    setFiles((f) => ({ ...f, [field]: file }));
   }
 
   async function handleSubmit(e) {
@@ -274,9 +286,10 @@ function FileField({ label, file, onChange, full }) {
       {label}
       <span className={`badgepage__file-drop ${file ? 'has-file' : ''}`}>
         <UploadCloud size={16} />
-        {file ? file.name : 'Choose file'}
-        <input type="file" accept="image/*,.pdf" onChange={(e) => onChange(e.target.files)} />
+        <span className="badgepage__file-name">{file ? file.name : 'Choose file (JPG, PNG, WEBP, or PDF)'}</span>
+        <input type="file" accept={ACCEPTED_DOC_INPUT_ATTR} onChange={(e) => onChange(e.target.files)} />
       </span>
     </label>
   );
 }
+

@@ -3,6 +3,12 @@
   padding: var(--sp-8) 0;
 }
 
+[data-theme='dark'] .stats-strip {
+  background: var(--black-2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
 .stats-strip__grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -16,14 +22,13 @@
   align-items: center;
   gap: var(--sp-1);
 }
-
 .stats-strip__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 40px; height: 40px;
   border-radius: 50%;
-  background: rgba(18, 209, 111, 0.16);
+  background: rgba(18, 209, 111, 0.12);
   color: var(--light-green);
   margin-bottom: var(--sp-1);
 }
@@ -32,8 +37,10 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(1.5rem, 3vw, 2.25rem);
-  color: var(--light-green);
+  color: #ffffff;
 }
+
+[data-theme='dark'] .stats-strip__value { color: var(--white-1); }
 
 .stats-strip__label {
   font-size: 0.85rem;

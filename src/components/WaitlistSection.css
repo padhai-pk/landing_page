@@ -54,6 +54,10 @@
   color: #fff;
 }
 
+[data-theme='dark'] .waitlist__tab--active {
+  background: var(--green);
+}
+
 .waitlist__note {
   display: flex;
   align-items: flex-start;
@@ -78,8 +82,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--sp-4);
+  min-width: 0;
 }
-
+.waitlist__row > * {
+  min-width: 0;
+}
 .waitlist__form label {
   display: flex;
   flex-direction: column;
