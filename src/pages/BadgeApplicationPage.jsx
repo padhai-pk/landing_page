@@ -4,12 +4,14 @@ import { ArrowLeft, Award, UploadCloud, CheckCircle2, Loader2, FileText } from '
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import CountryCitySelect from '../components/CountryCitySelect.jsx';
+import PhoneInput from '../components/PhoneInput.jsx';
 import { useContent } from '../lib/content.jsx';
 import { SUBJECTS, CATEGORIES, BADGE_SEATS_PER_SUBJECT } from '../lib/subjects.js';
 import { listenToSubjects, joinTeacherBadgeWaitlist } from '../lib/waitlist.js';
 import './BadgeApplicationPage.css';
 import { uploadFileToDrive } from '../lib/driveUpload.js';
 import { validateDocFile, ACCEPTED_DOC_INPUT_ATTR } from '../lib/fileValidation.js';
+import { isValidEmail, isValidCnic, formatCnicInput } from '../lib/validators.js';
 
 const emptyForm = {
   name: '', email: '', phone: '', country: '', city: '', cnicNumber: '',
@@ -26,6 +28,9 @@ export default function BadgeApplicationPage() {
   const [files, setFiles] = useState({ cnicFront: null, cnicBack: null, qualificationCert: null });
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [phoneValid, setPhoneValid] = useState(false);
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [cnicTouched, setCnicTouched] = useState(false);
   const [uploadStage, setUploadStage] = useState(''); // '' | 'cnicFront' | 'cnicBack' | 'qualificationCert' | 'saving'
   const [error, setError] = useState('');
   const [result, setResult] = useState(null); // { status, subjectName }
@@ -69,9 +74,22 @@ export default function BadgeApplicationPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-
     if (!form.name.trim() || !form.email.trim() || !form.phone.trim() || !form.cnicNumber.trim()) {
       setError('Please fill in your name, email, phone, and CNIC number.');
+      return;
+    }
+    if (!isValidEmail(form.email)) {
+      setEmailTouched(true);
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (!phoneValid) {
+      setError('Please enter a valid phone number for the selected country.');
+      return;
+    }
+    if (!isValidCnic(form.cnicNumber)) {
+      setCnicTouched(true);
+      setError('Please enter a valid 13-digit CNIC number.');
       return;
     }
     if (!form.subjectId) {
@@ -172,12 +190,40 @@ export default function BadgeApplicationPage() {
               <h3>Your details</h3>
               <div className="badgepage__row">
                 <label>Full name<input value={form.name} onChange={(e) => update('name', e.target.value)} placeholder="Fatima Ahmed" required /></label>
-                <label>Email<input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} placeholder="you@email.com" required /></label>
-              </div>
+                <label>
+                  Email
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => update('email', e.target.value)}
+                    onBlur={() => setEmailTouched(true)}
+                    placeholder="you@email.com"
+                    required
+                  />
+                  {emailTouched && form.email && !isValidEmail(form.email) && (
+                    <span className="badgepage__field-error">Enter a valid email address.</span>
+                  )}
+                </label> </div>
               <div className="badgepage__row">
-                <label>WhatsApp / phone<input value={form.phone} onChange={(e) => update('phone', e.target.value)} placeholder="+92 3XX-XXXXXXX" required /></label>
-                <label>CNIC number<input value={form.cnicNumber} onChange={(e) => update('cnicNumber', e.target.value)} placeholder="XXXXX-XXXXXXX-X" required /></label>
-              </div>
+              <label>
+                  WhatsApp / phone
+                  <PhoneInput onChange={(full, valid) => { update('phone', full); setPhoneValid(valid); }} />
+                </label>
+                <label>
+                  CNIC number
+                  <input
+                    value={form.cnicNumber}
+                    onChange={(e) => update('cnicNumber', formatCnicInput(e.target.value))}
+                    onBlur={() => setCnicTouched(true)}
+                    placeholder="XXXXX-XXXXXXX-X"
+                    maxLength={15}
+                    required
+                  />
+                  {cnicTouched && form.cnicNumber && !isValidCnic(form.cnicNumber) && (
+                    <span className="badgepage__field-error">Enter a valid 13-digit CNIC number.</span>
+                  )}
+                </label>
+                </div>
               <div className="badgepage__row">
                 <CountryCitySelect
                   country={form.country}

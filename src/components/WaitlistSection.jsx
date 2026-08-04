@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GraduationCap, Users, Award, Loader2, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Reveal from './Reveal.jsx';
 import SubjectPicker from './SubjectPicker.jsx';
 import CountryCitySelect from './CountryCitySelect.jsx';
+import PhoneInput from './PhoneInput.jsx';
 import { useContent } from '../lib/content.jsx';
 import './WaitlistSection.css';
 import { SUBJECTS, CATEGORIES } from '../lib/subjects.js';
 import { joinStudentWaitlist, joinTeacherNormalWaitlist } from '../lib/waitlist.js';
+import { isValidEmail } from '../lib/validators.js';
 
 const TABS = [
   { id: 'student', label: 'Join as student', icon: <Users size={16} /> },
@@ -16,29 +18,41 @@ const TABS = [
 
 const emptyForm = { name: '', email: '', phone: '', country: '', city: '', experience: '' };
 
-export default function WaitlistSection({ subjects, onResult }) {
+export default function WaitlistSection({ subjects, onResult, activeTab, onTabChange }) {
   const content = useContent();
-  const [tab, setTab] = useState('student');
+  const [tab, setTab] = useState(activeTab || 'student');
   const [form, setForm] = useState(emptyForm);
   const [chosenSubjects, setChosenSubjects] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [phoneValid, setPhoneValid] = useState(false);
+  const [phoneResetKey, setPhoneResetKey] = useState(0);
+  const [emailTouched, setEmailTouched] = useState(false);
 
   const subjectList = subjects.length ? subjects : SUBJECTS.map((s) => ({ ...s, badgeSeatsFilled: 0, badgeSeatsMax: 2 }));
   const categoriesInList = [...new Set(subjectList.map((s) => s.category))].length
     ? [...new Set(subjectList.map((s) => s.category))]
     : CATEGORIES;
 
+    useEffect(() => {
+      if (activeTab && activeTab !== tab) {
+        switchTab(activeTab);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeTab]);
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
   }
-
   function switchTab(id) {
     setTab(id);
+    onTabChange?.(id);
     setError('');
     setForm(emptyForm);
     setChosenSubjects([]);
+    setPhoneValid(false);
+    setPhoneResetKey((k) => k + 1);
   }
+
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -46,6 +60,15 @@ export default function WaitlistSection({ subjects, onResult }) {
 
     if (!form.name.trim() || !form.email.trim() || !form.phone.trim()) {
       setError('Please fill in your name, email, and phone number.');
+      return;
+    }
+    if (!isValidEmail(form.email)) {
+      setEmailTouched(true);
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (!phoneValid) {
+      setError('Please enter a valid phone number for the selected country.');
       return;
     }
     if (chosenSubjects.length === 0) {
@@ -64,6 +87,8 @@ export default function WaitlistSection({ subjects, onResult }) {
       }
       setForm(emptyForm);
       setChosenSubjects([]);
+      setPhoneValid(false);
+      setPhoneResetKey((k) => k + 1);
     } catch (err) {
       console.error(err);
       setError(err?.message || 'Something went wrong on our end — please try again in a moment.');
@@ -121,13 +146,25 @@ export default function WaitlistSection({ subjects, onResult }) {
                 </label>
                 <label>
                   Email
-                  <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} placeholder="you@email.com" required />
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => update('email', e.target.value)}
+                    onBlur={() => setEmailTouched(true)}
+                    placeholder="you@email.com"
+                    required
+                  />
+                  {emailTouched && form.email && !isValidEmail(form.email) && (
+                    <span className="waitlist__field-error">Enter a valid email address.</span>
+                  )}
                 </label>
               </div>
-
               <label className="waitlist__full">
                 WhatsApp / phone
-                <input value={form.phone} onChange={(e) => update('phone', e.target.value)} placeholder="+92 3XX-XXXXXXX" required />
+                <PhoneInput
+                  key={phoneResetKey}
+                  onChange={(full, valid) => { update('phone', full); setPhoneValid(valid); }}
+                />
               </label>
 
               <div className="waitlist__row">

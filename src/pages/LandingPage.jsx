@@ -17,7 +17,13 @@ export default function LandingPage() {
   const [subjects, setSubjects] = useState([]);
   const [stats, setStats] = useState({ studentsCount: 0, teachersNormalCount: 0, teachersBadgeCount: 0 });
   const [toast, setToast] = useState(null);
+  const [waitlistTab, setWaitlistTab] = useState('student');
 
+  function goToWaitlist(tab) {
+    setWaitlistTab(tab);
+    const el = document.getElementById('waitlist');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
   useEffect(() => {
     const unsubSubjects = listenToSubjects(setSubjects);
     const unsubStats = listenToStats(setStats);
@@ -35,13 +41,13 @@ export default function LandingPage() {
     <>
       <Navbar />
       <main>
-        <Hero stats={stats} />
+      <Hero stats={stats} onSelectTab={goToWaitlist} />
         <StatsStrip stats={stats} subjects={subjects} />
         <ProblemSection />
         <HowItWorks />
         <FeaturesGrid />
         <SeatProgram subjects={subjects} />
-        <WaitlistSection subjects={subjects} onResult={showToast} />
+        <WaitlistSection subjects={subjects} onResult={showToast} activeTab={waitlistTab} onTabChange={setWaitlistTab} />
         <FAQSection />
       </main>
       <Footer />

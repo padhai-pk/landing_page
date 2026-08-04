@@ -15,7 +15,7 @@ const BG_ICONS = [
   { icon: 'PenTool', top: '30%', left: '3%', size: 36, delay: 0.3, duration: 7, rotate: -14 },
 ];
 
-export default function Hero({ stats }) {
+export default function Hero({ stats, onSelectTab }) {
   const content = useContent();
   const { hero, demoStats } = content;
   const EyebrowIcon = getIcon(hero.eyebrowIcon);
@@ -47,12 +47,12 @@ export default function Hero({ stats }) {
         </p>
 
         <div className="hero__ctas hero__anim" style={{ '--d': '240ms' }}>
-          <a href="#waitlist" className="btn btn-primary btn-lg">
+          <button type="button" className="btn btn-primary btn-lg" onClick={() => onSelectTab?.('student')}>
             {hero.ctaPrimary} <ArrowRight size={18} />
-          </a>
-          <a href="#waitlist" className="btn btn-secondary-outline btn-lg">
+          </button>
+          <button type="button" className="btn btn-secondary-outline btn-lg" onClick={() => onSelectTab?.('teacher')}>
             <CtaIcon size={18} /> {hero.ctaSecondary}
-          </a>
+          </button>
         </div>
 
         <div className="hero__proof hero__anim" style={{ '--d': '320ms' }}>

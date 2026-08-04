@@ -208,3 +208,10 @@
   .badgepage__row { grid-template-columns: 1fr; }
   .badgepage__form { padding: var(--sp-5); }
 }
+
+.badgepage__field-error {
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--error);
+  margin-top: -4px;
+}

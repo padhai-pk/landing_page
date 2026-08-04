@@ -79,10 +79,10 @@
   },
   "badgeProgram": {
     "eyebrow": "For teachers",
-    "heading": "2 free Verified Badge seats per subject.\nWorth Rs. 3,000 each.",
+    "heading": "2 free Verified Badge seats per subject.\nWorth Rs. 999 each.",
     "body": "We're seeding teacher supply before launch. The first two teachers to claim a subject get full verification \u2014 CNIC check, qualification review, and a short interview \u2014 completely free, plus a featured profile for 3 months.",
     "ctaLabel": "Apply for a free Verified Badge",
-    "seatValueLabel": "Rs. 3,000",
+    "seatValueLabel": "Rs. 999",
     "documentsRequired": [
       "CNIC \u2014 front and back (clear photo or scan)",
       "Highest qualification certificate / degree",
@@ -94,7 +94,9 @@
       "I understand my documents will be reviewed by the Padhai.pk team for verification purposes only.",
       "I understand sharing contact details with students outside the Padhai.pk platform violates the Terms of Service.",
       "I understand a Verified Badge seat is limited to the first 2 approved teachers per subject and is not guaranteed until reviewed.",
-      "I agree to be contacted by the Padhai.pk team for a short verification interview."
+      "I agree that the Verified badge will be available for only 1 Year and can be reclaimed after by small verifications.",
+      "I agree to be contacted by the Padhai.pk team for a short verification interview.",
+      "I understand after the App launch if account is not logged in within 3 days the Free Badge would not be able claim"
     ]
   },
   "faqs": [
@@ -104,11 +106,11 @@
     },
     {
       "q": "Is the Verified Badge really free?",
-      "a": "Yes. CNIC and qualification verification plus a short interview is completely free for the first two teachers per subject \u2014 a value of Rs. 3,000 \u2014 with a featured profile for 3 months. We monetise through optional profile boosts later, not through verification."
+      "a": "Yes. CNIC and qualification verification plus a short interview is completely free for the first two teachers per subject \u2014 a value of Rs. 999 \u2014 for 1 Year. We monetise through optional profile boosts later, not through verification."
     },
     {
       "q": "What happens after I join the waitlist?",
-      "a": "You'll get an email the moment your city and subjects are ready for launch, plus early access before we open sign-ups publicly. Badge applicants also get interview and document-submission instructions by email."
+      "a": "You'll get an email the moment your subjects are ready for launch, plus early access before we open sign-ups publicly. Badge applicants also get interview and document-submission instructions by email."
     },
     {
       "q": "Do you only support Pakistan?",
@@ -121,7 +123,7 @@
   ],
   "footer": {
     "tagline": "Padhna ho ya Padhana, sirf Padhai.pk pr aana.",
-    "copyright": "Padhai.pk. Pre-launch \u2014 open to students and teachers everywhere."
+    "copyright": "Padhai.pk."
   },
   "demoStats": {
     "studentsCount": 184,

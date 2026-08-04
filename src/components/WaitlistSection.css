@@ -193,3 +193,10 @@
 .waitlist__badge-promo-text strong { display: block; font-size: 0.92rem; margin-bottom: 2px; }
 .waitlist__badge-promo-text p { margin: 0; font-size: 0.84rem; }
 .waitlist__badge-promo-btn { flex-shrink: 0; white-space: nowrap; }
+
+.waitlist__field-error {
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--error);
+  margin-top: -2px;
+}

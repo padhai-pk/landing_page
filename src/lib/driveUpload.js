@@ -1,48 +1,59 @@
 // src/lib/driveUpload.js
 import { validateDocFile } from './fileValidation.js';
 
-const MAX_FILE_BYTES = 8 * 1024 * 1024; // 8MB — keep comfortably under Vercel's body limit
+// Vercel's request body limit is a hard ~4.5MB regardless of any code
+// config — base64 inflates a file by ~33%, so the RAW file needs to stay
+// well under that after encoding.
+const MAX_FILE_BYTES = 3 * 1024 * 1024; // 3MB raw → ~4MB base64
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => {
-      const base64 = String(reader.result).split(',')[1];
-      resolve(base64);
-    };
+    reader.onload = () => resolve(String(reader.result).split(',')[1]);
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
 }
 
-// Uploads a single File to the shared Google Drive verification folder via
-// /api/upload-to-drive. Returns { fileId, webViewLink } or throws.
 export async function uploadFileToDrive(file) {
   if (!file) return null;
 
   const check = validateDocFile(file);
-  if (!check.valid) {
-    throw new Error(check.reason);
-  }
+  if (!check.valid) throw new Error(check.reason);
   if (file.size > MAX_FILE_BYTES) {
-    throw new Error(`"${file.name}" is too large (max 8MB). Please compress it and try again.`);
+    throw new Error(`"${file.name}" is too large (max 3MB). Most camera apps have a "smaller size" or "medium quality" option — try that and re-select the file.`);
   }
 
   const base64 = await fileToBase64(file);
 
-  const res = await fetch('/api/upload-to-drive', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ filename: file.name, mimeType: file.type || 'application/octet-stream', base64 }),
-  });
+  let res;
+  try {
+    res = await fetch('/api/upload-to-drive', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: file.name, mimeType: file.type || 'application/octet-stream', base64 }),
+    });
+  } catch {
+    throw new Error('Could not reach the upload service — check your internet connection and try again.');
+  }
+
+  if (res.ok) return res.json();
 
   if (res.status === 429) {
     throw new Error('Too many uploads right now — please wait a bit and try again.');
   }
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || 'Document upload failed. Please try again.');
-  }
 
-  return res.json();
+  // Surface the real reason, but don't crash if the error response isn't
+  // JSON (e.g. a raw platform-level 413/504 page).
+  let message = `Upload failed (HTTP ${res.status}).`;
+  try {
+    const body = await res.json();
+    if (body?.error) message = body.error;
+  } catch {
+    try {
+      const text = await res.text();
+      if (text) message = `Upload failed (HTTP ${res.status}): ${text.slice(0, 200)}`;
+    } catch { /* give up, use the generic message */ }
+  }
+  throw new Error(message);
 }
