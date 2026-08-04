@@ -1,12 +1,12 @@
 // api/upload-to-drive.js
 //
 // Vercel serverless function. Uploads a base64-encoded verification
-// document to a shared Google Drive folder via a service account.
+// document to a folder in YOUR OWN Google Drive, using OAuth (not a
+// service account — service accounts have no Drive storage quota of
+// their own as of Google's policy change).
 //
-// Every failure path below returns a specific, human-readable error in the
-// JSON response — check your browser's Network tab (or curl the endpoint
-// directly, see README) to see exactly which step failed, without needing
-// access to Vercel's dashboard logs.
+// See scripts/getDriveRefreshToken.mjs for the one-time setup that mints
+// GOOGLE_OAUTH_REFRESH_TOKEN.
 
 import { google } from 'googleapis';
 import { Readable } from 'stream';
@@ -16,19 +16,20 @@ import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 const RATE_LIMIT_MAX = 15;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 
-// Vercel's hard request-body limit is ~4.5MB regardless of any app-level
-// config. Base64 inflates a file by ~33%, so we reject early with a clear
-// message instead of letting the platform silently 413 the request.
+// Vercel's hard request-body limit is ~4.5MB regardless of any code
+// config. Base64 inflates a file by ~33%, so reject early with a clear
+// message instead of letting the platform silently fail the request.
 const MAX_BASE64_BYTES = 4 * 1024 * 1024;
 
-function getPrivateKey() {
+function getFirestorePrivateKey() {
   return (process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '').replace(/\\n/g, '\n');
 }
 
-function getMissingEnvVars() {
+function getMissingDriveEnvVars() {
   const required = {
-    GOOGLE_SERVICE_ACCOUNT_EMAIL: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    GOOGLE_SERVICE_ACCOUNT_KEY: process.env.GOOGLE_SERVICE_ACCOUNT_KEY,
+    GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID,
+    GOOGLE_OAUTH_CLIENT_SECRET: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
+    GOOGLE_OAUTH_REFRESH_TOKEN: process.env.GOOGLE_OAUTH_REFRESH_TOKEN,
     GOOGLE_DRIVE_FOLDER_ID: process.env.GOOGLE_DRIVE_FOLDER_ID,
   };
   return Object.entries(required).filter(([, v]) => !v).map(([k]) => k);
@@ -36,18 +37,18 @@ function getMissingEnvVars() {
 
 let dbInstance = null;
 function getDb() {
-  // Rate limiting is best-effort. If Firestore admin init isn't available
-  // for any reason, we skip rate limiting rather than fail the upload.
   if (dbInstance) return dbInstance;
   const projectId = process.env.VITE_FIREBASE_PROJECT_ID || process.env.FIREBASE_PROJECT_ID;
-  if (!projectId) return null;
+  if (!projectId || !process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_SERVICE_ACCOUNT_KEY) {
+    return null; // rate limiting is best-effort, not required
+  }
   try {
     if (!getApps().length) {
       initializeApp({
         credential: cert({
           projectId,
           clientEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-          privateKey: getPrivateKey(),
+          privateKey: getFirestorePrivateKey(),
         }),
       });
     }
@@ -102,10 +103,10 @@ export default async function handler(req, res) {
       return;
     }
 
-    const missing = getMissingEnvVars();
+    const missing = getMissingDriveEnvVars();
     if (missing.length) {
       res.status(500).json({
-        error: `Server misconfigured — missing env var(s): ${missing.join(', ')}. Add them in Vercel → Project → Settings → Environment Variables (for Production, Preview, AND Development), then redeploy.`,
+        error: `Server misconfigured — missing env var(s): ${missing.join(', ')}. Run scripts/getDriveRefreshToken.mjs and add the results in Vercel → Settings → Environment Variables, then redeploy.`,
       });
       return;
     }
@@ -123,7 +124,6 @@ export default async function handler(req, res) {
       return;
     }
 
-    // Rate limiting — best effort, never blocks the upload if it errors.
     try {
       const db = getDb();
       if (db) {
@@ -139,24 +139,24 @@ export default async function handler(req, res) {
       console.error('Rate limit check failed (continuing without it):', err.message);
     }
 
-    let auth;
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_OAUTH_CLIENT_ID,
+      process.env.GOOGLE_OAUTH_CLIENT_SECRET
+    );
+    oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_OAUTH_REFRESH_TOKEN });
+
     try {
-      auth = new google.auth.JWT({
-        email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        key: getPrivateKey(),
-        scopes: ['https://www.googleapis.com/auth/drive.file'],
-      });
-      await auth.authorize();
+      await oauth2Client.getAccessToken();
     } catch (err) {
-      console.error('Google auth failed:', err.message);
+      console.error('OAuth token refresh failed:', err.message);
       res.status(500).json({
-        error: `Google authentication failed: ${err.message}. Double-check GOOGLE_SERVICE_ACCOUNT_EMAIL and GOOGLE_SERVICE_ACCOUNT_KEY were copied exactly from the JSON key (the key must include the literal "\\n" line breaks).`,
+        error: `Google authorization failed: ${err.message}. Your refresh token may have been revoked — re-run scripts/getDriveRefreshToken.mjs and update GOOGLE_OAUTH_REFRESH_TOKEN in Vercel.`,
       });
       return;
     }
 
     try {
-      const drive = google.drive({ version: 'v3', auth });
+      const drive = google.drive({ version: 'v3', auth: oauth2Client });
       const buffer = Buffer.from(base64, 'base64');
       const stream = Readable.from(buffer);
       const safeName = sanitizeFilename(filename);
@@ -172,7 +172,7 @@ export default async function handler(req, res) {
       const reason = err?.response?.data?.error?.message || err.message;
       console.error('Drive upload failed:', reason);
       res.status(500).json({
-        error: `Google Drive upload failed: ${reason}. Check that GOOGLE_DRIVE_FOLDER_ID is correct and that the folder is shared with ${process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL} as Editor, and that the Drive API is enabled on your Google Cloud project.`,
+        error: `Google Drive upload failed: ${reason}. Check that GOOGLE_DRIVE_FOLDER_ID is a folder that exists in the same Google account you authorized in Step 2.`,
       });
     }
   } catch (err) {
