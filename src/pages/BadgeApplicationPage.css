@@ -215,3 +215,25 @@
   color: var(--error);
   margin-top: -4px;
 }
+
+.badgepage__subjects-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--fg);
+  margin-bottom: var(--sp-2);
+}
+.badgepage__subjects-cap {
+  margin: var(--sp-2) 0 0;
+  font-size: 0.78rem;
+  color: var(--accent-secondary);
+}
+.badgepage__result-block {
+  text-align: left;
+  background: var(--bg-secondary);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+  width: 100%;
+}
+.badgepage__result-block strong { display: block; margin-bottom: 4px; }
+.badgepage__result-block p { margin: 0; }

@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import CountryCitySelect from '../components/CountryCitySelect.jsx';
 import PhoneInput from '../components/PhoneInput.jsx';
+import SubjectPicker from '../components/SubjectPicker.jsx';
 import { useContent } from '../lib/content.jsx';
 import { SUBJECTS, CATEGORIES, BADGE_SEATS_PER_SUBJECT } from '../lib/subjects.js';
 import { listenToSubjects, joinTeacherBadgeWaitlist } from '../lib/waitlist.js';
@@ -15,9 +16,11 @@ import { isValidEmail, isValidCnic, formatCnicInput } from '../lib/validators.js
 
 const emptyForm = {
   name: '', email: '', phone: '', country: '', city: '', cnicNumber: '',
-  subjectId: '', qualification: '', institution: '', experience: '',
+  qualification: '', institution: '', experience: '',
   bio: '', introVideoLink: '',
 };
+
+const MAX_BADGE_SUBJECTS = 10;
 
 export default function BadgeApplicationPage() {
   const content = useContent();
@@ -25,6 +28,7 @@ export default function BadgeApplicationPage() {
 
   const [subjects, setSubjects] = useState([]);
   const [form, setForm] = useState(emptyForm);
+  const [chosenSubjectIds, setChosenSubjectIds] = useState([]);
   const [files, setFiles] = useState({ cnicFront: null, cnicBack: null, qualificationCert: null });
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -43,14 +47,20 @@ export default function BadgeApplicationPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
   const subjectList = subjects.length ? subjects : SUBJECTS.map((s) => ({ ...s, badgeSeatsFilled: 0, badgeSeatsMax: BADGE_SEATS_PER_SUBJECT }));
   const categoriesInList = [...new Set(subjectList.map((s) => s.category))].length
     ? [...new Set(subjectList.map((s) => s.category))]
     : CATEGORIES;
-  const groupedOptions = categoriesInList
-    .map((cat) => ({ category: cat, items: subjectList.filter((s) => s.category === cat) }))
-    .filter((g) => g.items.length);
+
+  // Only subjects with at least one open seat are selectable here.
+  const availableSubjects = subjectList.filter(
+    (s) => (s.badgeSeatsFilled || 0) < (s.badgeSeatsMax || BADGE_SEATS_PER_SUBJECT)
+  );
+
+  function handleSubjectsChange(nextIds) {
+    if (nextIds.length > MAX_BADGE_SUBJECTS) return; // ignore attempts past the cap
+    setChosenSubjectIds(nextIds);
+  }
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -92,8 +102,12 @@ export default function BadgeApplicationPage() {
       setError('Please enter a valid 13-digit CNIC number.');
       return;
     }
-    if (!form.subjectId) {
-      setError('Choose the subject you want to teach.');
+    if (chosenSubjectIds.length === 0) {
+      setError('Choose at least one subject you want to teach.');
+      return;
+    }
+    if (chosenSubjectIds.length > MAX_BADGE_SUBJECTS) {
+      setError(`You can apply for up to ${MAX_BADGE_SUBJECTS} subjects at once.`);
       return;
     }
     if (!form.qualification.trim()) {
@@ -121,6 +135,7 @@ export default function BadgeApplicationPage() {
       setUploadStage('saving');
       const res = await joinTeacherBadgeWaitlist({
         ...form,
+        subjectIds: chosenSubjectIds,
         policiesAccepted: true,
         documents: {
           cnicFront: cnicFront?.webViewLink || null,
@@ -139,29 +154,28 @@ export default function BadgeApplicationPage() {
   }
 
   if (result) {
+    const reserved = result.results.filter((r) => r.status === 'seat_reserved');
+    const full = result.results.filter((r) => r.status === 'subject_full');
     return (
       <>
         <Navbar />
         <main className="badgepage">
           <div className="container badgepage__result">
             <span className="badgepage__result-icon"><CheckCircle2 size={40} /></span>
-            {result.status === 'seat_reserved' ? (
-              <>
-                <h1>Seat reserved for {result.subjectName}!</h1>
-                <p>
-                  You've claimed one of the free Verified Badge seats. Our team will reach out by email to
-                  schedule your short verification interview and confirm your documents — usually within a few days.
-                </p>
-              </>
-            ) : (
-              <>
-                <h1>Both seats for {result.subjectName} are taken</h1>
-                <p>
-                  You've been added to our general teacher waitlist automatically, and we've emailed you the details.
-                  You're welcome to apply again under a different subject any time.
-                </p>
-              </>
+            <h1>Application submitted!</h1>
+            {reserved.length > 0 && (
+              <div className="badgepage__result-block">
+                <strong>Seats reserved ({reserved.length}):</strong>
+                <p>{reserved.map((r) => r.subjectName).join(', ')}</p>
+              </div>
             )}
+            {full.length > 0 && (
+              <div className="badgepage__result-block">
+                <strong>Already full — added to general waitlist ({full.length}):</strong>
+                <p>{full.map((r) => r.subjectName).join(', ')}</p>
+              </div>
+            )}
+            <p>Our team will reach out by email to schedule your short verification interview and confirm your documents — usually within a few days.</p>
             <Link to="/" className="btn btn-primary btn-lg">Back to homepage</Link>
           </div>
         </main>
@@ -169,7 +183,6 @@ export default function BadgeApplicationPage() {
       </>
     );
   }
-
   return (
     <>
       <Navbar />
@@ -233,26 +246,21 @@ export default function BadgeApplicationPage() {
                 />
               </div>
               <div className="badgepage__row">
-                <label className="badgepage__full">
-                  Subject you want to teach
-                  <select value={form.subjectId} onChange={(e) => update('subjectId', e.target.value)} required>
-                    <option value="" disabled>Select a subject</option>
-                    {groupedOptions.map((g) => (
-                      <optgroup key={g.category} label={g.category}>
-                        {g.items.map((s) => {
-                          const full = (s.badgeSeatsFilled || 0) >= (s.badgeSeatsMax || BADGE_SEATS_PER_SUBJECT);
-                          return (
-                            <option key={s.id} value={s.id} disabled={full}>
-                              {s.name} {full ? '— Full' : `— ${(s.badgeSeatsMax || BADGE_SEATS_PER_SUBJECT) - (s.badgeSeatsFilled || 0)} seat(s) open`}
-                            </option>
-                          );
-                        })}
-                      </optgroup>
-                    ))}
-                  </select>
-                </label>
+                <div className="badgepage__full">
+                  <span className="badgepage__subjects-label">
+                    Subjects you want to teach ({chosenSubjectIds.length}/{MAX_BADGE_SUBJECTS})
+                  </span>
+                  <SubjectPicker
+                    subjects={availableSubjects}
+                    value={chosenSubjectIds}
+                    onChange={handleSubjectsChange}
+                    categories={categoriesInList}
+                  />
+                  {chosenSubjectIds.length >= MAX_BADGE_SUBJECTS && (
+                    <p className="badgepage__subjects-cap">Maximum of {MAX_BADGE_SUBJECTS} subjects reached.</p>
+                  )}
+                </div>
               </div>
-
               <h3>Qualifications</h3>
               <div className="badgepage__row">
                 <label>Highest qualification<input value={form.qualification} onChange={(e) => update('qualification', e.target.value)} placeholder="BSc Computer Science" required /></label>

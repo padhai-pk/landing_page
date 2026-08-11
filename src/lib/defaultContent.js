@@ -9,6 +9,24 @@ export const DEFAULT_CONTENT = {
     "srcDark": "/logo_dark.png",
     "alt": "Padhai.pk"    
   },
+  "social": {
+  "facebook": "https://www.facebook.com/profile.php?id=61592359305253",
+  "instagram": "https://www.instagram.com/padhai.pk/",
+  "instagram_bts": "https://www.instagram.com/padhai.pk_bts/"
+},
+"instagramPopup": {
+  "title": "Follow along for updates",
+  "main": {
+    "handle": "@padhai.pk",
+    "blurb": "Get the latest updates about Padhai.pk — launch dates, new subjects, and teacher spotlights.",
+    "url": "https://www.instagram.com/padhai.pk/"
+  },
+  "bts": {
+    "handle": "@padhai_bts",
+    "blurb": "See the exclusive behind-the-scenes of how we're building the Padhai.pk platform and Meet the Co-founders.",
+    "url": "https://www.instagram.com/padhai.pk_bts/"
+  }
+},
   "tagline": "Padhna ho ya Padhana, Sirf Padhai.pk pr aana",
   "nav": {
     "links": [

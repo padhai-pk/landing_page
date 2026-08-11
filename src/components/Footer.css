@@ -28,3 +28,19 @@
 .footer__links a:hover { color: var(--light-green); }
 
 .footer__copy { width: 100%; font-size: 0.78rem; color: rgba(248, 249, 250, 0.45); margin: 0; padding-top: var(--sp-6); border-top: 1px solid rgba(248,249,250,0.12); }
+
+.footer__social {
+  display: flex;
+  gap: var(--sp-3);
+}
+.footer__social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(248, 249, 250, 0.1);
+  color: #fff;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.footer__social a:hover { background: var(--light-green); color: #06371f; transform: translateY(-2px); }

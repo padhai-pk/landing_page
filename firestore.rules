@@ -65,13 +65,14 @@ service cloud.firestore {
         && d.phone is string && d.phone.size() > 0;
     }
 
-    function isValidTeacherBadge() {
+  function isValidTeacherBadge() {
       let d = request.resource.data;
       return d.name is string && d.name.size() > 0
         && d.email is string && d.email.matches('.*@.*\\..*')
         && d.phone is string && d.phone.size() > 0
-        && d.subjectId is string
-        && d.status in ['seat_reserved', 'subject_full'];
+        && d.subjectResults is list
+        && d.subjectResults.size() > 0
+        && d.subjectResults.size() <= 10;
     }
 
     function isValidSubjectSeatUpdate() {

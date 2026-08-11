@@ -1,0 +1,82 @@
+.insta-popup__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(13, 20, 28, 0.55);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: var(--sp-6);
+    animation: fade-slide-up 0.25s var(--ease);
+  }
+  @media (min-width: 640px) {
+    .insta-popup__overlay { align-items: center; }
+  }
+  
+  .insta-popup {
+    position: relative;
+    background: var(--card-bg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--r-xl);
+    box-shadow: 0 24px 64px var(--shadow-strong);
+    padding: var(--sp-8);
+    max-width: 560px;
+    width: 100%;
+  }
+  
+  .insta-popup__close {
+    position: absolute;
+    top: var(--sp-4);
+    right: var(--sp-4);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: var(--bg-secondary);
+    color: var(--fg-secondary);
+    cursor: pointer;
+  }
+  .insta-popup__close:hover { color: var(--fg); }
+  
+  .insta-popup__title {
+    text-align: center;
+    margin-bottom: var(--sp-6);
+  }
+  
+  .insta-popup__cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-4);
+  }
+  
+  .insta-popup__card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--sp-2);
+    background: var(--bg-secondary);
+    border-radius: var(--r-lg);
+    padding: var(--sp-5);
+  }
+  
+  .insta-popup__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: rgba(18, 209, 111, 0.14);
+    color: var(--accent-primary);
+    margin-bottom: var(--sp-1);
+  }
+  
+  .insta-popup__card strong { font-size: 0.95rem; }
+  .insta-popup__card p { font-size: 0.82rem; margin: 0 0 var(--sp-2); }
+  .insta-popup__card .btn { width: 100%; }
+  
+  @media (max-width: 480px) {
+    .insta-popup__cards { grid-template-columns: 1fr; }
+  }

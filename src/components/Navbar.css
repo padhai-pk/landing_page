@@ -101,3 +101,8 @@
     display: inline-flex !important;
   }
 }
+
+.navbar__social { display: none; }
+@media (min-width: 640px) {
+  .navbar__social { display: inline-flex; }
+}

@@ -11,6 +11,7 @@ import FAQSection from '../components/FAQSection.jsx';
 import Footer from '../components/Footer.jsx';
 import Toast from '../components/Toast.jsx';
 import BackToTop from '../components/BackToTop.jsx';
+import InstagramPopup from '../components/InstagramPopup.jsx';
 import { listenToSubjects, listenToStats } from '../lib/waitlist.js';
 
 export default function LandingPage() {
@@ -53,6 +54,7 @@ export default function LandingPage() {
       <Footer />
       <Toast toast={toast} onClose={() => setToast(null)} />
       <BackToTop />
+      <InstagramPopup />
     </>
   );
 }

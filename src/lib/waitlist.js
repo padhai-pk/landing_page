@@ -129,38 +129,50 @@ export async function joinTeacherNormalWaitlist(formData) {
 // Applies for a free Verified Badge seat (worth Rs. 3,000) for ONE subject.
 // Uses a transaction so two simultaneous submissions can never both win the
 // same seat. Returns { status: 'seat_reserved' | 'subject_full' }.
+// Applies for free Verified Badge seats across MULTIPLE subjects (max 10)
+// in a single atomic transaction — each subject is claimed independently,
+// so a teacher can get "seat_reserved" on some and "subject_full" on
+// others within the same application.
 export async function joinTeacherBadgeWaitlist(formData) {
-  const subjectRef = doc(db, 'subjects', formData.subjectId);
+  const subjectIds = (formData.subjectIds || []).slice(0, 10);
+  if (subjectIds.length === 0) {
+    throw new Error('Select at least one subject.');
+  }
+
   const applicationRef = doc(collection(db, 'waitlistTeachersBadge'));
   const statsRef = doc(db, 'stats', 'global');
 
-  const result = await runTransaction(db, async (tx) => {
-    const subjectSnap = await tx.get(subjectRef);
+  const results = await runTransaction(db, async (tx) => {
+    // Firestore transactions require ALL reads before ANY writes.
+    const subjectRefs = subjectIds.map((id) => doc(db, 'subjects', id));
+    const subjectSnaps = await Promise.all(subjectRefs.map((ref) => tx.get(ref)));
 
-    if (!subjectSnap.exists()) {
-      // Subjects collection hasn't been seeded yet — see scripts/seedSubjects.mjs.
-      // We don't silently invent the doc here, because that's how a partially
-      // seeded `subjects` collection ends up hiding subjects from the live list.
-      throw new Error(
-        `Subject "${formData.subjectId}" isn't set up in Firestore yet. Run the seed script (see README) before accepting badge applications.`
+    const perSubject = subjectSnaps.map((snap, i) => {
+      if (!snap.exists()) {
+        throw new Error(
+          `Subject "${subjectIds[i]}" isn't set up in Firestore yet. Run the seed script (see README) before accepting badge applications.`
+        );
+      }
+      const data = snap.data();
+      const filled = data.badgeSeatsFilled ?? 0;
+      const max = data.badgeSeatsMax ?? BADGE_SEATS_PER_SUBJECT;
+      const seatAvailable = filled < max;
+      return { ref: subjectRefs[i], id: subjectIds[i], name: data.name, filled, max, seatAvailable };
+    });
+
+    perSubject.forEach((s) => {
+      tx.set(
+        s.ref,
+        { badgeSeatsFilled: s.seatAvailable ? s.filled + 1 : s.filled },
+        { merge: true }
       );
-    }
+    });
 
-    const current = subjectSnap.data();
-    const filled = current.badgeSeatsFilled ?? 0;
-    const max = current.badgeSeatsMax ?? BADGE_SEATS_PER_SUBJECT;
-    const seatAvailable = filled < max;
-
-    tx.set(
-      subjectRef,
-      {
-        name: current.name,
-        category: current.category,
-        badgeSeatsMax: max,
-        badgeSeatsFilled: seatAvailable ? filled + 1 : filled,
-      },
-      { merge: true }
-    );
+    const subjectResults = perSubject.map((s) => ({
+      subjectId: s.id,
+      subjectName: s.name,
+      status: s.seatAvailable ? 'seat_reserved' : 'subject_full',
+    }));
 
     tx.set(applicationRef, {
       name: formData.name,
@@ -169,8 +181,7 @@ export async function joinTeacherBadgeWaitlist(formData) {
       city: formData.city,
       country: formData.country || '',
       cnicNumber: formData.cnicNumber || '',
-      subjectId: formData.subjectId,
-      subjectName: current.name,
+      subjectResults,
       qualification: formData.qualification || '',
       institution: formData.institution || '',
       experience: formData.experience || '',
@@ -182,33 +193,30 @@ export async function joinTeacherBadgeWaitlist(formData) {
         qualificationCert: formData.documents?.qualificationCert || null,
       },
       policiesAccepted: formData.policiesAccepted || false,
-      status: seatAvailable ? 'seat_reserved' : 'subject_full',
       createdAt: serverTimestamp(),
     });
 
     tx.set(statsRef, { teachersBadgeCount: increment(1) }, { merge: true });
 
-    return { status: seatAvailable ? 'seat_reserved' : 'subject_full', subjectName: current.name };
+    return subjectResults;
   });
 
-  // If the two seats were already taken, queue a notification email via the
-  // Firebase "Trigger Email" extension (watches the `mail` collection).
-  if (result.status === 'subject_full') {
+  // Email any subjects that were already full when this application landed.
+  const fullOnes = results.filter((r) => r.status === 'subject_full');
+  if (fullOnes.length > 0) {
     await addDoc(collection(db, 'mail'), {
       to: [formData.email],
       message: {
-        subject: `Padhai.pk — ${result.subjectName} already has 2 verified teachers`,
+        subject: `Padhai.pk — some subjects you applied for already have 2 verified teachers`,
         text:
           `Hi ${formData.name},\n\n` +
-          `Thanks for applying for a free Verified Badge seat (worth Rs. 3,000) for ${result.subjectName}. ` +
-          `Both seats for this subject have already been claimed by other teachers.\n\n` +
-          `Good news — you're still on our general teacher waitlist, and we'll reach out the moment a new ` +
-          `badge round opens or a seat frees up. You can also pick a different subject any time.\n\n` +
-          `— Team Padhai.pk`,
+          `Thanks for applying for free Verified Badge seats. Here's how each subject went:\n\n` +
+          results.map((r) => `- ${r.subjectName}: ${r.status === 'seat_reserved' ? 'Seat reserved!' : 'Already full — added to general waitlist'}`).join('\n') +
+          `\n\n— Team Padhai.pk`,
       },
       createdAt: serverTimestamp(),
     });
   }
 
-  return result;
+  return { results };
 }

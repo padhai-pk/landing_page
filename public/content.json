@@ -4,6 +4,24 @@
     "srcDark": "logo_dark.png",
     "alt": "Padhai.pk"
   },
+  "social": {
+    "facebook": "https://www.facebook.com/profile.php?id=61592359305253",
+    "instagram": "https://www.instagram.com/padhai.pk/",
+    "instagram_bts": "https://www.instagram.com/padhai.pk_bts/"
+  },
+  "instagramPopup": {
+    "title": "Follow along for updates",
+    "main": {
+      "handle": "@padhai.pk",
+      "blurb": "Launch dates, new subjects, teacher spotlights \u2014 follow along so you never miss when your subject goes live.",
+      "url": "https://www.instagram.com/padhai.pk/"
+    },
+    "bts": {
+      "handle": "@padhai_bts",
+      "blurb": "Watch us build Padhai.pk from scratch, and meet the co-founders behind it.",
+      "url": "https://www.instagram.com/padhai.pk_bts/"
+    }
+  },
   "tagline": "Padhna ho ya Padhana, Sirf Padhai.pk pr aana",
   "nav": {
     "links": [
@@ -17,108 +35,108 @@
   },
   "hero": {
     "eyebrowIcon": "Sparkles",
-    "eyebrow": "Pre-launch \u00b7 open to students & teachers worldwide",
+    "eyebrow": "Pre-launch \u00b7 open to students & teachers everywhere",
     "headlineLine1": "Padhna ho ya Padhana,",
     "headlineLine2": "sirf Padhai.pk pr aana.",
-    "subtext": "Post what you need to learn, get proposals from verified tutors, and pay only when the session happens \u2014 held safely in escrow. Free to learn. Real to earn. Built in Urdu, priced in PKR.",
+    "subtext": "Padhai.pk brings students and teachers onto one safe platform. No more paying an advance to a \"tutor\" who never shows up.  Find a verified teacher for any subject, try a free demo, and start learning \u2014 with your payment protected until the session is actually done. If you can teach, list your skills and start earning from students who genuinely need you.",
     "ctaPrimary": "Join as a student",
     "ctaSecondaryIcon": "GraduationCap",
-    "ctaSecondary": "I'm a teacher \u2014 claim a free Verified Badge",
-    "proofSuffix": "students & teachers already on the waitlist \u2014 before a single rupee of marketing spend."
+    "ctaSecondary": "I'm a teacher \u2014 claim my free Verified Badge",
+    "proofSuffix": "students & teachers already on the waitlist \u2014 before we've spent a single rupee on ads."
   },
   "problem": {
     "eyebrow": "The problem",
-    "heading": "Pakistan's tutoring economy runs on trust.\nNothing is built to protect it.",
-    "body": "25.1 million Pakistani children are out of school, and the private tutoring market that fills the gap is almost entirely informal \u2014 WhatsApp groups, paper ads, word of mouth. No verification. No escrow. No accountability when it goes wrong.",
+    "heading": "Pakistan's tuition system runs on trust.\nRight now, nothing protects it.",
+    "body": "Over 25 million Pakistani children are out of school \u2014 and the tuition system meant to fill that gap is almost entirely informal: Facebook groups, paper ads on walls, a stranger's WhatsApp number passed around. No verification. No safety net for your money. No accountability when it goes wrong.",
     "cards": [
       {
         "icon": "UserRound",
         "tag": "The learner",
         "who": "Ali, 17 \u2014 needs a teacher",
-        "text": "Appearing in FSc Pre-Medical. His academy wants Rs. 4,000/month \u2014 money his family doesn't have. A tutor from a Facebook group took his father's advance and never came back."
+        "text": "Appearing in his FSc Pre-Medical exams this year. His local academy charges Rs. 4,000/month \u2014 money his family can't spare. A \"tutor\" he found in a Facebook group took his father's advance payment and never came back."
       },
       {
         "icon": "Lightbulb",
         "tag": "The teacher",
-        "who": "Fatima, 21 \u2014 has the answer",
-        "text": "Tops her class in Python and Web Dev. Already tutors two juniors for free \u2014 no trustworthy place to list herself, no safe way to get paid, no proof of her track record."
+        "who": "Fatima, 21 \u2014 already has the answer",
+        "text": "Tops her class in Python and Web Development. She's already tutoring two juniors for free, purely because she's good at explaining things \u2014 but has no safe way to list herself, get paid properly, or prove her track record."
       },
       {
         "icon": "Unlink",
         "tag": "No trust layer",
         "who": "The gap between them",
-        "text": "They're a five-minute conversation apart. But nothing verifies either side, protects payment, or holds anyone accountable \u2014 so both stay stuck."
+        "text": "Ali needs exactly what Fatima can teach, and they're minutes apart. But nothing connects them safely \u2014 so Ali keeps struggling, and Fatima keeps teaching for free."
       }
     ]
   },
   "howItWorks": {
     "eyebrow": "How it works",
-    "heading": "Five steps. No WhatsApp gambling.",
+    "heading": "Five simple steps. No scams, no guesswork.",
     "steps": [
-      { "icon": "FileEdit", "title": "Post what you need", "text": "Subject, level, budget, Teacher Skills & Experience. Takes under a minute." },
-      { "icon": "Send", "title": "Teachers send proposals", "text": "Verified tutors bid with a price and a short pitch." },
-      { "icon": "Video", "title": "Free demo, in-app", "text": "An Optional Free Demo Session on the Platform before anyone commits to anything." },
-      { "icon": "Landmark", "title": "Pay into escrow", "text": "JazzCash, EasyPaisa, or card. Held safely until the session is completed without issue." },
-      { "icon": "BadgeCheck", "title": "Teacher gets paid", "text": "Payment is released to teacher automatically after confirmation. Both sides leave a review." }
+      { "icon": "FileEdit", "title": "Post what you need", "text": "Subject, level, budget, and the kind of teacher you're looking for. Takes less than a minute." },
+      { "icon": "Send", "title": "Teachers send proposals", "text": "Verified teachers respond with their price and a short pitch \u2014 you choose who feels right." },
+      { "icon": "Video", "title": "Try a free demo, in-app", "text": "An optional free demo session, right inside Padhai.pk, before anyone commits to anything." },
+      { "icon": "Landmark", "title": "Pay into a safe escrow", "text": "JazzCash, EasyPaisa, or card. Your money stays protected until the session is completed \u2014 no exceptions." },
+      { "icon": "BadgeCheck", "title": "Teacher gets paid, you both review", "text": "Payment is released automatically once the session is confirmed. Both sides leave a review for the next person." }
     ]
   },
   "features": {
-    "eyebrow": "What's in the MVP",
-    "heading": "Built lean. Built for launch.",
-    "subtext": "Every feature below is scoped, scheduled, and already under development.",
+    "eyebrow": "What we're building",
+    "heading": "Built for Pakistan, from day one.",
+    "subtext": "Every feature below is already scoped and in development \u2014 this isn't just a pitch, it's the plan.",
     "items": [
-      { "icon": "ArrowLeftRight", "title": "Tutor marketplace", "text": "Students post requests, teachers send proposals \u2014 a real bidding marketplace, not a static directory." },
-      { "icon": "PenLine", "title": "Posts & proposals", "text": "Subject, budget, and city drive every match. Teachers pitch with price and a short intro." },
-      { "icon": "TrendingUp", "title": "Profile & post boosts", "text": "Teachers boost their profile to rank higher; students boost urgent posts for faster proposals." },
-      { "icon": "Star", "title": "Proposal subscriptions", "text": "A monthly plan gives teachers extra proposals once they outgrow the free monthly quota." },
-      { "icon": "Video", "title": "Live sessions", "text": "In-app video for demos and paid classes \u2014 no separate app, no shared personal numbers." },
-      { "icon": "Lock", "title": "Escrow payments", "text": "Student payment is held safely and only released to the teacher once a session is confirmed complete." },
-      { "icon": "Landmark", "title": "Connected payouts", "text": "Teachers link a bank account or mobile wallet directly to the platform to receive earnings." },
-      { "icon": "Wallet", "title": "JazzCash \u00b7 EasyPaisa \u00b7 Card \u00b7 Bank Transfers", "text": "Pay the way Pakistan actually pays \u2014 no foreign card required." }
+      { "icon": "ArrowLeftRight", "title": "One platform, both sides", "text": "Students post what they need to learn. Teachers respond with proposals. You match on your own terms \u2014 not through a random Facebook post." },
+      { "icon": "PenLine", "title": "Posts & proposals", "text": "Subject, budget, and requirement every match. Teachers pitch with their price and a short introduction." },
+      { "icon": "TrendingUp", "title": "Get seen faster", "text": "Teachers can boost their profile to rank higher in search. Students can boost an urgent post to get proposals sooner." },
+      { "icon": "Star", "title": "More proposals when you need them", "text": "A simple monthly plan gives active teachers extra proposals once they've used up their free monthly quota." },
+      { "icon": "Video", "title": "Live sessions, right in the app", "text": "Demo classes and paid sessions happen over in-app video \u2014 no separate app, no sharing personal numbers with strangers." },
+      { "icon": "Lock", "title": "Your money stays protected", "text": "A student's payment is held safely and only released to the teacher once a session is confirmed complete." },
+      { "icon": "Landmark", "title": "Get paid directly", "text": "Teachers link a bank account or mobile wallet straight to the platform \u2014 earnings come to you, with no middlemen." },
+      { "icon": "Wallet", "title": "JazzCash \u00b7 EasyPaisa \u00b7 Card \u00b7 Bank Transfer", "text": "Pay however you already pay in real life. No foreign card, no complicated setup." }
     ]
   },
   "badgeProgram": {
     "eyebrow": "For teachers",
-    "heading": "2 free Verified Badge seats per subject.\nWorth Rs. 999 each.",
-    "body": "We're seeding teacher supply before launch. The first two teachers to claim a subject get full verification \u2014 CNIC check, qualification review, and a short interview \u2014 completely free, plus a featured profile for 3 months.",
-    "ctaLabel": "Apply for a free Verified Badge",
-    "seatValueLabel": "Rs. 999",
+    "heading": "2 free Verified Badge seats per subject.\nWorth Rs. 1,999 \u2014 yours for free.",
+    "body": "We're earning trust before we chase traffic. The first two teachers to claim each subject get fully verified \u2014 CNIC check, qualification review, a short interview \u2014 completely free, plus a featured profile for 3 months. After these seats are gone, verification becomes a paid badge.",
+    "ctaLabel": "Claim your free Verified Badge",
+    "seatValueLabel": "Rs. 1,999",
     "documentsRequired": [
       "CNIC \u2014 front and back (clear photo or scan)",
-      "Highest qualification certificate / degree",
+      "Your highest qualification certificate or degree",
       "A short 30\u201360 second introduction video",
       "Optional: a 2\u20135 minute sample teaching clip"
     ],
     "policies": [
       "I confirm all information and documents I submit are accurate and belong to me.",
-      "I understand my documents will be reviewed by the Padhai.pk team for verification purposes only.",
-      "I understand sharing contact details with students outside the Padhai.pk platform violates the Terms of Service.",
-      "I understand a Verified Badge seat is limited to the first 2 approved teachers per subject and is not guaranteed until reviewed.",
-      "I agree that the Verified badge will be available for only 1 Year and can be reclaimed after by small verifications.",
-      "I agree to be contacted by the Padhai.pk team for a short verification interview.",
-      "I understand after the App launch if account is not logged in within 3 days the Free Badge would not be able claim"
+      "I understand my documents will only be used by the Padhai.pk team, for verification purposes.",
+      "I understand sharing contact details with students outside the Padhai.pk platform goes against our Terms of Service.",
+      "I understand a free badge seat is limited to the first 2 approved teachers per subject, and isn't guaranteed until reviewed.",
+      "I agree the Verified Badge is valid for 1 year, and can be renewed afterward with a quick re-verification.",
+      "I agree to a short verification call with the Padhai.pk team.",
+      "I understand that if I don't log into the app within 3 days of launch, my free badge claim may be released to someone else."
     ]
   },
   "faqs": [
     {
       "q": "What exactly is Padhai.pk?",
-      "a": "A tutor marketplace: students post what they want to learn, verified teachers send proposals, and paid sessions happen inside the app over video, with payment held safely until the session is confirmed complete."
+      "a": "A safe way for students and teachers to find each other. Students post what they want to learn, verified teachers send proposals, and paid sessions happen inside the app over video \u2014 with your money held safely until the session is actually done."
     },
     {
       "q": "Is the Verified Badge really free?",
-      "a": "Yes. CNIC and qualification verification plus a short interview is completely free for the first two teachers per subject \u2014 a value of Rs. 999 \u2014 for 1 Year. We monetise through optional profile boosts later, not through verification."
+      "a": "Yes \u2014 completely free for the first two teachers per subject. That's a Rs. 1,999 value: CNIC verification, qualification review, and a short interview, at no cost, valid for one year. We make money later through optional profile boosts \u2014 not by charging you to get verified."
     },
     {
       "q": "What happens after I join the waitlist?",
-      "a": "You'll get an email the moment your subjects are ready for launch, plus early access before we open sign-ups publicly. Badge applicants also get interview and document-submission instructions by email."
+      "a": "You'll get an email the moment your subject is ready for launch, plus early access before we open sign-ups to everyone. If you applied for a teacher badge, we'll also email you the next steps for document review and your interview."
     },
     {
       "q": "Do you only support Pakistan?",
-      "a": "Padhai.pk is built for Pakistani students and teachers \u2014 priced in PKR, verified by CNIC \u2014 but the waitlist is open to anyone, anywhere, including Pakistanis abroad and teachers who want to reach students back home."
+      "a": "Padhai.pk is built for Pakistani students and teachers \u2014 priced in rupees, verified by CNIC \u2014 but our waitlist is open to anyone, anywhere, including Pakistanis abroad and teachers who want to reach students back home."
     },
     {
       "q": "What if my subject's badge seats are already full?",
-      "a": "You're still added to our general teacher waitlist automatically, and we'll email you if a seat frees up or a new badge round opens. You can also apply again under a different subject."
+      "a": "You're automatically added to our general teacher waitlist, and we'll email you the moment a seat opens up or a new round starts. You're also welcome to apply again under a different subject."
     }
   ],
   "footer": {

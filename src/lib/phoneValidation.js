@@ -1,41 +1,42 @@
 // src/lib/phoneValidation.js
-// Basic, per-country phone number validation — approximate national-number
-// length ranges for common countries, with a general fallback for everyone
-// else. This is intentionally simple (length + digits-only), not a full
-// numbering-plan library.
+// Per-country phone validation — starting digit(s) + length, not just
+// length. Falls back to a general digits-only length check for countries
+// not listed below.
 
-const LENGTH_RULES = {
-    PK: { min: 10, max: 10, example: '3XXXXXXXXX' },
-    IN: { min: 10, max: 10, example: '9XXXXXXXXX' },
-    US: { min: 10, max: 10, example: '2015550123' },
-    CA: { min: 10, max: 10, example: '2015550123' },
-    GB: { min: 10, max: 10, example: '7911123456' },
-    AE: { min: 9, max: 9, example: '501234567' },
-    SA: { min: 9, max: 9, example: '512345678' },
-    BD: { min: 10, max: 10, example: '1812345678' },
-    AU: { min: 9, max: 9, example: '412345678' },
-    DE: { min: 10, max: 11, example: '15123456789' },
-    FR: { min: 9, max: 9, example: '612345678' },
-  };
-  
-  const DEFAULT_RULE = { min: 6, max: 12 };
-  
-  export function validateNationalNumber(nationalNumber, cca2) {
-    const digitsOnly = (nationalNumber || '').replace(/\D/g, '');
-  
-    if (!digitsOnly) {
-      return { valid: false, reason: 'Enter a phone number.' };
-    }
-  
-    const rule = LENGTH_RULES[cca2] || DEFAULT_RULE;
-  
-    if (digitsOnly.length < rule.min || digitsOnly.length > rule.max) {
-      const expected = rule.min === rule.max ? `${rule.min} digits` : `${rule.min}\u2013${rule.max} digits`;
-      return {
-        valid: false,
-        reason: `Enter a valid number (${expected}${rule.example ? `, e.g. ${rule.example}` : ''}).`,
-      };
-    }
-  
-    return { valid: true, digitsOnly };
+const RULES = {
+  // Pakistani mobile numbers: 10 digits, must start with 3 (e.g. 3211234567)
+  PK: { pattern: /^3\d{9}$/, example: '3211234567', description: 'must start with 3, 10 digits' },
+  // Indian mobile numbers: 10 digits, start with 6, 7, 8, or 9
+  IN: { pattern: /^[6-9]\d{9}$/, example: '9812345678', description: 'must start with 6-9, 10 digits' },
+  // Bangladeshi mobile numbers: 10 digits, start with 1, second digit 3-9
+  BD: { pattern: /^1[3-9]\d{8}$/, example: '1812345678', description: 'must start with 1, 10 digits' },
+  // US / Canada: 10 digits, area code can't start with 0 or 1
+  US: { pattern: /^[2-9]\d{9}$/, example: '2015550123', description: '10 digits' },
+  CA: { pattern: /^[2-9]\d{9}$/, example: '2015550123', description: '10 digits' },
+  // UK mobile: 10 digits after the leading 0 is dropped, starts with 7
+  GB: { pattern: /^7\d{9}$/, example: '7911123456', description: 'must start with 7, 10 digits' },
+  AE: { pattern: /^5\d{8}$/, example: '501234567', description: 'must start with 5, 9 digits' },
+  SA: { pattern: /^5\d{8}$/, example: '512345678', description: 'must start with 5, 9 digits' },
+  AU: { pattern: /^4\d{8}$/, example: '412345678', description: 'must start with 4, 9 digits' },
+};
+
+const DEFAULT_RULE = { pattern: /^\d{6,12}$/, description: '6-12 digits' };
+
+export function validateNationalNumber(nationalNumber, cca2) {
+  const digitsOnly = (nationalNumber || '').replace(/\D/g, '');
+
+  if (!digitsOnly) {
+    return { valid: false, reason: 'Enter a phone number.' };
   }
+
+  const rule = RULES[cca2] || DEFAULT_RULE;
+
+  if (!rule.pattern.test(digitsOnly)) {
+    return {
+      valid: false,
+      reason: `Enter a valid number (${rule.description}${rule.example ? `, e.g. ${rule.example}` : ''}).`,
+    };
+  }
+
+  return { valid: true, digitsOnly };
+}
