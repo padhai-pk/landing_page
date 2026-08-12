@@ -5,3 +5,10 @@ dist
 .DS_Store
 scripts/serviceAccountKey.json
 firebase.rules
+admin-app/.padhai_admin_config.json
+admin-app/serviceAccountKey.json
+admin-app/venv
+backend/
+
+.vercel
+.env*

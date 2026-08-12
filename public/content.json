@@ -14,12 +14,14 @@
     "main": {
       "handle": "@padhai.pk",
       "blurb": "Launch dates, new subjects, teacher spotlights \u2014 follow along so you never miss when your subject goes live.",
-      "url": "https://www.instagram.com/padhai.pk/"
+      "url": "https://www.instagram.com/padhai.pk/",
+      "profileImage": "instagram-padhai-pk.jpg"
     },
     "bts": {
       "handle": "@padhai_bts",
       "blurb": "Watch us build Padhai.pk from scratch, and meet the co-founders behind it.",
-      "url": "https://www.instagram.com/padhai.pk_bts/"
+      "url": "https://www.instagram.com/padhai.pk_bts/",
+      "profileImage": "instagram-padhai-bts.jpg"
     }
   },
   "tagline": "Padhna ho ya Padhana, Sirf Padhai.pk pr aana",

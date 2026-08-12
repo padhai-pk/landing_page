@@ -22,19 +22,18 @@ service cloud.firestore {
     // Waitlist submissions: anyone can create (public form), nobody can
     // read, update, or delete from the client — only your admin/back office
     // (using the Firebase Admin SDK, which bypasses these rules) can.
+    // The backend (Admin SDK, bypasses these rules) is now the only
+    // writer to these three collections.
     match /waitlistStudents/{docId} {
-      allow create: if isValidStudent();
-      allow read, update, delete: if false;
+      allow read, write: if false;
     }
 
     match /waitlistTeachersNormal/{docId} {
-      allow create: if isValidTeacherNormal();
-      allow read, update, delete: if false;
+      allow read, write: if false;
     }
 
     match /waitlistTeachersBadge/{docId} {
-      allow create: if isValidTeacherBadge();
-      allow read, update, delete: if false;
+      allow read, write: if false;
     }
 
     // Consumed by the Firebase "Trigger Email" extension. Client may only

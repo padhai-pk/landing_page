@@ -19,12 +19,14 @@ export const DEFAULT_CONTENT = {
   "main": {
     "handle": "@padhai.pk",
     "blurb": "Get the latest updates about Padhai.pk — launch dates, new subjects, and teacher spotlights.",
-    "url": "https://www.instagram.com/padhai.pk/"
+    "url": "https://www.instagram.com/padhai.pk/",
+    "profileImage": "instagram-padhai-pk.jpg"
   },
   "bts": {
     "handle": "@padhai_bts",
     "blurb": "See the exclusive behind-the-scenes of how we're building the Padhai.pk platform and Meet the Co-founders.",
-    "url": "https://www.instagram.com/padhai.pk_bts/"
+    "url": "https://www.instagram.com/padhai.pk_bts/",
+    "profileImage": "instagram-padhai-bts.jpg"
   }
 },
   "tagline": "Padhna ho ya Padhana, Sirf Padhai.pk pr aana",

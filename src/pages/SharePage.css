@@ -1,0 +1,213 @@
+.sharepage {
+  padding: calc(var(--header-h) + var(--sp-5)) 0 var(--sp-10);
+  min-height: 100vh;
+}
+
+.sharepage__inner { max-width: 640px; text-align: center; }
+.sharepage__head { margin-bottom: var(--sp-3); }
+.sharepage__head h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1.6rem;
+  margin-bottom: 2px;
+}
+.sharepage__head-icon { color: var(--accent-primary); flex-shrink: 0; }
+.sharepage__head p { max-width: 520px; margin: 0 auto; color: var(--fg-secondary); font-size: 0.92rem; }
+
+.sharepage__empty { text-align: center; padding: var(--sp-20) 0; }
+
+.sharepage__badge-results {
+  background: var(--bg-secondary);
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-4);
+  text-align: left;
+  margin-bottom: var(--sp-3);
+  font-size: 0.82rem;
+}
+.sharepage__badge-results p { margin: 0 0 2px; }
+
+.sharepage__card-shell {
+  margin-bottom: var(--sp-3);
+}
+
+.sharepage__card-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+
+.sharepage__theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--bg-secondary);
+  border-radius: var(--r-full);
+  padding: 3px;
+}
+
+.sharepage__theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--fg-secondary);
+  border-radius: var(--r-full);
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.sharepage__theme-btn.is-active {
+  background: var(--card-bg);
+  color: var(--fg);
+  box-shadow: 0 1px 4px var(--shadow);
+}
+
+.sharepage__avatar-control {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.sharepage__avatar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--fg);
+  border-radius: var(--r-full);
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.sharepage__avatar-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+.sharepage__avatar-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sharepage__avatar-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--fg-secondary);
+  cursor: pointer;
+}
+.sharepage__avatar-remove:hover { color: var(--error); border-color: var(--error); }
+
+.sharepage__top-share { flex-shrink: 0; }
+
+.sharepage__avatar-note {
+  font-size: 0.76rem;
+  color: var(--fg-secondary);
+  text-align: left;
+  margin: 0 0 var(--sp-3);
+}
+
+.sharepage__card-wrap {
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: 0 20px 48px var(--shadow-strong);
+  display: flex;
+  justify-content: center;
+  background: var(--bg-secondary);
+}
+
+/* The card is sized in JS to match its own content height, then scaled
+   down here so the whole thing is always visible without scrolling. */
+.sharepage__canvas {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: min(56vh, 560px);
+  display: block;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.sharepage__boost-rules {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  color: var(--accent-secondary);
+  background: rgba(18, 209, 111, 0.08);
+  border: 1px solid rgba(18, 209, 111, 0.22);
+  border-radius: var(--r-full);
+  padding: 8px 16px;
+  margin: 0 auto var(--sp-3);
+  font-size: 0.8rem;
+  max-width: 100%;
+}
+.sharepage__boost-rules svg { flex-shrink: 0; color: var(--accent-primary); }
+
+.sharepage__claimed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  background: rgba(18, 209, 111, 0.12);
+  color: var(--accent-primary);
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-4);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: var(--sp-4);
+}
+
+.sharepage__note {
+  font-size: 0.85rem;
+  color: var(--fg-secondary);
+  margin-bottom: var(--sp-4);
+}
+
+.sharepage__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  justify-content: center;
+  margin-bottom: var(--sp-2);
+}
+
+.sharepage__admin-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  color: var(--fg-secondary);
+  margin-bottom: var(--sp-2);
+}
+
+.sharepage__skip {
+  border: none;
+  background: none;
+  color: var(--fg-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .sharepage__card-toolbar { flex-wrap: wrap; }
+  .sharepage__canvas { max-height: 62vh; }
+}

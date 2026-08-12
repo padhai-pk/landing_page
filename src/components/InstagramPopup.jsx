@@ -1,41 +1,102 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Instagram, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useContent } from '../lib/content.jsx';
 import './InstagramPopup.css';
 
-const SESSION_KEY = 'padhai-insta-popup-shown';
+const VIEW_THRESHOLD = 0.12;
 
-// Shows once per browser session, the first time the Seat Program section
-// (#badge-program) scrolls into view.
+function isBadgeSectionInView(el) {
+  if (!el) return false;
+  const rect = el.getBoundingClientRect();
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+  const visibleTop = Math.max(rect.top, 0);
+  const visibleBottom = Math.min(rect.bottom, viewportHeight);
+  const visibleHeight = visibleBottom - visibleTop;
+  if (visibleHeight <= 0) return false;
+  return visibleHeight / Math.max(rect.height, 1) >= VIEW_THRESHOLD;
+}
+
+function InstaProfileAvatar({ profileImage, handle }) {
+  const [failed, setFailed] = useState(false);
+  const imageSrc = profileImage?.startsWith('http') ? profileImage : `/${profileImage}`;
+
+  if (profileImage && !failed) {
+    return (
+      <img
+        className="insta-popup__avatar"
+        src={imageSrc}
+        alt={`${handle} profile`}
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+
+  const initial = (handle || '?').replace('@', '').charAt(0).toUpperCase();
+
+  return (
+    <span className="insta-popup__avatar insta-popup__avatar--fallback" aria-hidden="true">
+      {initial}
+    </span>
+  );
+}
+
+// Shows whenever the Seat Program section (#badge-program) scrolls into view.
+// Closing it hides it until the section leaves view and the user scrolls back.
 export default function InstagramPopup() {
   const content = useContent();
   const [visible, setVisible] = useState(false);
-  const hasShownRef = useRef(false);
+  const dismissedWhileInViewRef = useRef(false);
 
   useEffect(() => {
-    try {
-      if (sessionStorage.getItem(SESSION_KEY)) {
-        hasShownRef.current = true;
-      }
-    } catch { /* sessionStorage unavailable — popup will just show every load */ }
+    let io = null;
 
-    const target = document.getElementById('badge-program');
-    if (!target || hasShownRef.current) return;
+    function attachObserver() {
+      const target = document.getElementById('badge-program');
+      if (!target) return;
 
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasShownRef.current) {
-          hasShownRef.current = true;
-          setVisible(true);
-          try { sessionStorage.setItem(SESSION_KEY, '1'); } catch { /* ignore */ }
-          io.disconnect();
+      io = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            if (!dismissedWhileInViewRef.current) setVisible(true);
+          } else {
+            dismissedWhileInViewRef.current = false;
+          }
+        },
+        {
+          threshold: VIEW_THRESHOLD,
+          // Account for the fixed navbar and trigger slightly before the section fully enters view.
+          rootMargin: '-72px 0px -10% 0px',
         }
-      },
-      { threshold: 0.4 }
-    );
-    io.observe(target);
-    return () => io.disconnect();
+      );
+      io.observe(target);
+    }
+
+    attachObserver();
+
+    function onNavigateToBadgeSection() {
+      if (window.location.hash !== '#badge-program') return;
+      window.setTimeout(() => {
+        const target = document.getElementById('badge-program');
+        if (isBadgeSectionInView(target) && !dismissedWhileInViewRef.current) {
+          setVisible(true);
+        }
+      }, 350);
+    }
+
+    window.addEventListener('hashchange', onNavigateToBadgeSection);
+    if (window.location.hash === '#badge-program') onNavigateToBadgeSection();
+
+    return () => {
+      io?.disconnect();
+      window.removeEventListener('hashchange', onNavigateToBadgeSection);
+    };
   }, []);
+
+  function handleClose() {
+    dismissedWhileInViewRef.current = true;
+    setVisible(false);
+  }
 
   if (!visible) return null;
 
@@ -44,7 +105,7 @@ export default function InstagramPopup() {
   return (
     <div className="insta-popup__overlay" role="dialog" aria-modal="true" aria-label="Follow us on Instagram">
       <div className="insta-popup">
-        <button type="button" className="insta-popup__close" onClick={() => setVisible(false)} aria-label="Close">
+        <button type="button" className="insta-popup__close" onClick={handleClose} aria-label="Close">
           <X size={18} />
         </button>
 
@@ -52,7 +113,7 @@ export default function InstagramPopup() {
 
         <div className="insta-popup__cards">
           <div className="insta-popup__card">
-            <span className="insta-popup__icon"><Instagram size={24} /></span>
+            <InstaProfileAvatar profileImage={instagramPopup.main.profileImage} handle={instagramPopup.main.handle} />
             <strong>{instagramPopup.main.handle}</strong>
             <p>{instagramPopup.main.blurb}</p>
             <a href={instagramPopup.main.url} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-sm">
@@ -61,7 +122,7 @@ export default function InstagramPopup() {
           </div>
 
           <div className="insta-popup__card">
-            <span className="insta-popup__icon"><Instagram size={24} /></span>
+            <InstaProfileAvatar profileImage={instagramPopup.bts.profileImage} handle={instagramPopup.bts.handle} />
             <strong>{instagramPopup.bts.handle}</strong>
             <p>{instagramPopup.bts.blurb}</p>
             <a href={instagramPopup.bts.url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary-outline btn-sm">

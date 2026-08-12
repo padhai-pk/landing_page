@@ -1,5 +1,7 @@
 // src/lib/driveUpload.js
 import { validateDocFile } from './fileValidation.js';
+import { formatUploadError, networkErrorMessage } from './apiErrors.js';
+import { postToBackend } from './backend.js';
 
 // Vercel's request body limit is a hard ~4.5MB regardless of any code
 // config — base64 inflates a file by ~33%, so the RAW file needs to stay
@@ -26,35 +28,16 @@ export async function uploadFileToDrive(file) {
 
   const base64 = await fileToBase64(file);
 
-  let res;
   try {
-    res = await fetch('/api/upload-to-drive', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filename: file.name, mimeType: file.type || 'application/octet-stream', base64 }),
+    return await postToBackend('/upload-to-drive', {
+      filename: file.name,
+      mimeType: file.type || 'application/octet-stream',
+      base64,
     });
-  } catch {
-    throw new Error('Could not reach the upload service — check your internet connection and try again.');
+  } catch (err) {
+    const msg = err?.message || '';
+    if (!msg || msg.includes('Could not reach')) throw new Error(networkErrorMessage());
+    throw new Error(formatUploadError(msg));
   }
-
-  if (res.ok) return res.json();
-
-  if (res.status === 429) {
-    throw new Error('Too many uploads right now — please wait a bit and try again.');
-  }
-
-  // Surface the real reason, but don't crash if the error response isn't
-  // JSON (e.g. a raw platform-level 413/504 page).
-  let message = `Upload failed (HTTP ${res.status}).`;
-  try {
-    const body = await res.json();
-    if (body?.error) message = body.error;
-  } catch {
-    try {
-      const text = await res.text();
-      if (text) message = `Upload failed (HTTP ${res.status}): ${text.slice(0, 200)}`;
-    } catch { /* give up, use the generic message */ }
-  }
-  throw new Error(message);
 }
 

@@ -24,3 +24,8 @@ export function formatCnicInput(raw) {
 export function isNonEmpty(value) {
   return Boolean((value || '').trim());
 }
+
+export function isValidExperience(value) {
+  if (value === null || value === undefined || value === '') return true; // optional
+  return /^\d+$/.test(String(value).trim());
+}

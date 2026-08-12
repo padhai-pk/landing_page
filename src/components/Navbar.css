@@ -29,6 +29,7 @@
   display: flex;
   align-items: center;
   gap: var(--sp-2);
+  flex-shrink: 0;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.4rem;
@@ -39,7 +40,10 @@
 .navbar__logo-img {
   height: 34px;
   width: auto;
+  max-width: none;
   display: block;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 /* Nav links: use --fg at reduced opacity rather than --fg-secondary so
@@ -96,13 +100,38 @@
 .navbar__mobile a { font-weight: 600; color: var(--fg); padding: var(--sp-2) 0; }
 
 @media (max-width: 860px) {
-  .navbar__links, .navbar__cta { display: none; }
+  .navbar__links { display: none; }
+  .navbar__actions .navbar__cta { display: none !important; }
   .navbar__actions .navbar__burger {
     display: inline-flex !important;
+  }
+  /* Social links stay in the footer on mobile — keep the header for logo + controls only */
+  .navbar__social { display: none !important; }
+  .navbar__inner {
+    gap: var(--sp-3);
+  }
+  .navbar__actions {
+    gap: var(--sp-2);
+  }
+  .navbar__logo-img {
+    height: 30px;
   }
 }
 
 .navbar__social { display: none; }
-@media (min-width: 640px) {
+@media (min-width: 861px) {
   .navbar__social { display: inline-flex; }
+}
+
+@media (max-width: 400px) {
+  .navbar__inner {
+    gap: var(--sp-2);
+  }
+  .navbar__logo-img {
+    height: 26px;
+  }
+  .navbar__actions .icon-btn {
+    width: 36px;
+    height: 36px;
+  }
 }

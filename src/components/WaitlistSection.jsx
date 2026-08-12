@@ -9,7 +9,9 @@ import { useContent } from '../lib/content.jsx';
 import './WaitlistSection.css';
 import { SUBJECTS, CATEGORIES } from '../lib/subjects.js';
 import { joinStudentWaitlist, joinTeacherNormalWaitlist } from '../lib/waitlist.js';
-import { isValidEmail } from '../lib/validators.js';
+import { getUserFacingError } from '../lib/apiErrors.js';
+import { useNavigate } from 'react-router-dom';
+import { isValidEmail, isValidExperience } from '../lib/validators.js';
 
 const TABS = [
   { id: 'student', label: 'Join as student', icon: <Users size={16} /> },
@@ -17,9 +19,9 @@ const TABS = [
 ];
 
 const emptyForm = { name: '', email: '', phone: '', country: '', city: '', experience: '' };
-
 export default function WaitlistSection({ subjects, onResult, activeTab, onTabChange }) {
   const content = useContent();
+  const navigate = useNavigate();
   const [tab, setTab] = useState(activeTab || 'student');
   const [form, setForm] = useState(emptyForm);
   const [chosenSubjects, setChosenSubjects] = useState([]);
@@ -67,6 +69,10 @@ export default function WaitlistSection({ subjects, onResult, activeTab, onTabCh
       setError('Please enter a valid email address.');
       return;
     }
+    if (tab === 'teacher' && !isValidExperience(form.experience)) {
+      setError('Experience must be a number (e.g. 2).');
+      return;
+    }
     if (!phoneValid) {
       setError('Please enter a valid phone number for the selected country.');
       return;
@@ -75,23 +81,22 @@ export default function WaitlistSection({ subjects, onResult, activeTab, onTabCh
       setError('Pick at least one subject.');
       return;
     }
+    const subjectNames = subjectList.filter((s) => chosenSubjects.includes(s.id)).map((s) => s.name);
 
     setSubmitting(true);
     try {
       if (tab === 'student') {
-        await joinStudentWaitlist({ ...form, subjects: chosenSubjects });
-        onResult({ type: 'success', title: "You're on the list!", body: "We'll email you the moment Padhai.pk goes live for you." });
+        const { id, shareToken } = await joinStudentWaitlist({ ...form, subjects: chosenSubjects });
+        navigate('/share', { state: { role: 'student', name: form.name, id, shareToken, collection: 'waitlistStudents', subjects: subjectNames } });
       } else {
-        await joinTeacherNormalWaitlist({ ...form, subjects: chosenSubjects });
-        onResult({ type: 'success', title: "You're on the list!", body: 'Look out for an invite to onboard as one of our first verified teachers.' });
+        const { id, shareToken } = await joinTeacherNormalWaitlist({ ...form, subjects: chosenSubjects });
+        navigate('/share', { state: { role: 'teacher', name: form.name, id, shareToken, collection: 'waitlistTeachersNormal', subjects: subjectNames } });
       }
-      setForm(emptyForm);
-      setChosenSubjects([]);
-      setPhoneValid(false);
-      setPhoneResetKey((k) => k + 1);
     } catch (err) {
       console.error(err);
-      setError(err?.message || 'Something went wrong on our end — please try again in a moment.');
+      setError(getUserFacingError(err, {
+        action: tab === 'student' ? 'student-waitlist' : 'teacher-waitlist',
+      }));
     } finally {
       setSubmitting(false);
     }
@@ -191,7 +196,14 @@ export default function WaitlistSection({ subjects, onResult, activeTab, onTabCh
               {tab === 'teacher' && (
                 <label className="waitlist__full">
                   Years of teaching experience
-                  <input value={form.experience} onChange={(e) => update('experience', e.target.value)} placeholder="e.g. 3 years, or 'first time'" />
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={form.experience}
+                    onChange={(e) => update('experience', e.target.value)}
+                    placeholder="e.g. 2 (enter 0 if you're just starting)"
+                  />
                 </label>
               )}
 

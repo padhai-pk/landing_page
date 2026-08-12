@@ -12,7 +12,7 @@ import Footer from '../components/Footer.jsx';
 import Toast from '../components/Toast.jsx';
 import BackToTop from '../components/BackToTop.jsx';
 import InstagramPopup from '../components/InstagramPopup.jsx';
-import { listenToSubjects, listenToStats } from '../lib/waitlist.js';
+import { listenToBootstrap } from '../lib/waitlist.js';
 
 export default function LandingPage() {
   const [subjects, setSubjects] = useState([]);
@@ -26,12 +26,11 @@ export default function LandingPage() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   useEffect(() => {
-    const unsubSubjects = listenToSubjects(setSubjects);
-    const unsubStats = listenToStats(setStats);
-    return () => {
-      unsubSubjects();
-      unsubStats();
-    };
+    const unsub = listenToBootstrap({
+      onSubjects: setSubjects,
+      onStats: setStats,
+    });
+    return unsub;
   }, []);
 
   const showToast = useCallback((toastData) => {

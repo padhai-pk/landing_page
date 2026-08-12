@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Award, UploadCloud, CheckCircle2, Loader2, FileText } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Award, UploadCloud, Loader2, FileText } from 'lucide-react';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import CountryCitySelect from '../components/CountryCitySelect.jsx';
@@ -11,8 +11,9 @@ import { SUBJECTS, CATEGORIES, BADGE_SEATS_PER_SUBJECT } from '../lib/subjects.j
 import { listenToSubjects, joinTeacherBadgeWaitlist } from '../lib/waitlist.js';
 import './BadgeApplicationPage.css';
 import { uploadFileToDrive } from '../lib/driveUpload.js';
+import { getUserFacingError } from '../lib/apiErrors.js';
 import { validateDocFile, ACCEPTED_DOC_INPUT_ATTR } from '../lib/fileValidation.js';
-import { isValidEmail, isValidCnic, formatCnicInput } from '../lib/validators.js';
+import { isValidEmail, isValidCnic, formatCnicInput,isValidExperience } from '../lib/validators.js';
 
 const emptyForm = {
   name: '', email: '', phone: '', country: '', city: '', cnicNumber: '',
@@ -24,6 +25,7 @@ const MAX_BADGE_SUBJECTS = 10;
 
 export default function BadgeApplicationPage() {
   const content = useContent();
+  const navigate = useNavigate();
   const { badgeProgram } = content;
 
   const [subjects, setSubjects] = useState([]);
@@ -37,7 +39,6 @@ export default function BadgeApplicationPage() {
   const [cnicTouched, setCnicTouched] = useState(false);
   const [uploadStage, setUploadStage] = useState(''); // '' | 'cnicFront' | 'cnicBack' | 'qualificationCert' | 'saving'
   const [error, setError] = useState('');
-  const [result, setResult] = useState(null); // { status, subjectName }
 
   useEffect(() => {
     const unsub = listenToSubjects(setSubjects);
@@ -102,6 +103,10 @@ export default function BadgeApplicationPage() {
       setError('Please enter a valid 13-digit CNIC number.');
       return;
     }
+    if (!isValidExperience(form.experience)) {
+      setError('Experience must be a number (e.g. 2).');
+      return;
+    }
     if (chosenSubjectIds.length === 0) {
       setError('Choose at least one subject you want to teach.');
       return;
@@ -143,46 +148,38 @@ export default function BadgeApplicationPage() {
           qualificationCert: qualificationCert?.webViewLink || null,
         },
       });
-      setResult(res);
+      const subjectNames = subjectList
+        .filter((s) => chosenSubjectIds.includes(s.id))
+        .map((s) => s.name);
+      const claimedSubjectNames = (res.results || [])
+        .filter((r) => r.status === 'seat_reserved')
+        .map((r) => r.subjectName);
+
+      navigate('/share', {
+        state: {
+          role: 'badge',
+          name: form.name,
+          id: res.id,
+          shareToken: res.shareToken,
+          collection: 'waitlistTeachersBadge',
+          subjectResults: res.results,
+          subjects: subjectNames,
+          badgeSubjects: claimedSubjectNames,
+        },
+      });
     } catch (err) {
       console.error(err);
-      setError(err?.message || 'Something went wrong. Please try again.');
+      setError(getUserFacingError(err, {
+        action: 'badge-application',
+        uploadStage,
+      }));
     } finally {
       setSubmitting(false);
       setUploadStage('');
     }
   }
 
-  if (result) {
-    const reserved = result.results.filter((r) => r.status === 'seat_reserved');
-    const full = result.results.filter((r) => r.status === 'subject_full');
-    return (
-      <>
-        <Navbar />
-        <main className="badgepage">
-          <div className="container badgepage__result">
-            <span className="badgepage__result-icon"><CheckCircle2 size={40} /></span>
-            <h1>Application submitted!</h1>
-            {reserved.length > 0 && (
-              <div className="badgepage__result-block">
-                <strong>Seats reserved ({reserved.length}):</strong>
-                <p>{reserved.map((r) => r.subjectName).join(', ')}</p>
-              </div>
-            )}
-            {full.length > 0 && (
-              <div className="badgepage__result-block">
-                <strong>Already full — added to general waitlist ({full.length}):</strong>
-                <p>{full.map((r) => r.subjectName).join(', ')}</p>
-              </div>
-            )}
-            <p>Our team will reach out by email to schedule your short verification interview and confirm your documents — usually within a few days.</p>
-            <Link to="/" className="btn btn-primary btn-lg">Back to homepage</Link>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
-  }
+ 
   return (
     <>
       <Navbar />
@@ -267,8 +264,18 @@ export default function BadgeApplicationPage() {
                 <label>Institution<input value={form.institution} onChange={(e) => update('institution', e.target.value)} placeholder="e.g. FAST-NUCES" /></label>
               </div>
               <div className="badgepage__row">
-                <label>Years of teaching experience<input value={form.experience} onChange={(e) => update('experience', e.target.value)} placeholder="2 years, or 'first time'" /></label>
-                <label>Intro video link (optional)<input value={form.introVideoLink} onChange={(e) => update('introVideoLink', e.target.value)} placeholder="YouTube (unlisted) or Drive link" /></label>
+              <label>
+                    Years of teaching experience
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={form.experience}
+                      onChange={(e) => update('experience', e.target.value)}
+                      placeholder="e.g. 2 (enter 0 if you're just starting)"
+                    />
+                  </label>
+                   <label>Intro video link (optional)<input value={form.introVideoLink} onChange={(e) => update('introVideoLink', e.target.value)} placeholder="YouTube (unlisted) or Drive link" /></label>
               </div>
               <label className="badgepage__full">
                 Short bio / teaching philosophy
