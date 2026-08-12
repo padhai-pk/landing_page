@@ -38,8 +38,12 @@ function deepMergeCaptions(base, patch) {
   };
 }
 
-function firstName(name) {
-  return (name || 'I').trim().split(/\s+/)[0];
+function formatDisplayName(name) {
+  const words = (name || 'I').trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return 'I';
+  return words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 }
 
 function fill(template, vars) {
@@ -64,8 +68,11 @@ export function buildShareCaption(
     ? fill(blocks.waitlistIdLine, { waitlistId })
     : '';
 
+  const displayName = formatDisplayName(name);
+
   const vars = {
-    firstName: firstName(name),
+    firstName: displayName,
+    fullName: displayName,
     subjects: subjectsBlock,
     waitlistId: waitlistBlock,
     siteUrl,

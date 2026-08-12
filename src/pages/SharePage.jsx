@@ -216,25 +216,6 @@ export default function SharePage() {
                 />
               </div>
 
-              <div className="sharepage__theme-toggle" role="group" aria-label="Card color theme">
-                <button
-                  type="button"
-                  className={`sharepage__theme-btn ${cardTheme === 'dark' ? 'is-active' : ''}`}
-                  onClick={() => setCardTheme('dark')}
-                  aria-pressed={cardTheme === 'dark'}
-                >
-                  <Moon size={14} /> Dark
-                </button>
-                <button
-                  type="button"
-                  className={`sharepage__theme-btn ${cardTheme === 'light' ? 'is-active' : ''}`}
-                  onClick={() => setCardTheme('light')}
-                  aria-pressed={cardTheme === 'light'}
-                >
-                  <Sun size={14} /> Light
-                </button>
-              </div>
-
               <button type="button" className="btn btn-primary btn-sm sharepage__top-share" onClick={handleNativeShare}>
                 <Share2 size={15} /> Share now
               </button>
@@ -242,6 +223,27 @@ export default function SharePage() {
             <p className="sharepage__avatar-note">Your photo is only used to preview this card in your browser — it's never uploaded or sent to Padhai.pk.</p>
 
             <div className="sharepage__card-wrap">
+              <div className="sharepage__card-theme" aria-label="Card color theme">
+                <span className="sharepage__card-theme-label">Card theme</span>
+                <div className="sharepage__theme-toggle" role="group" aria-label="Card color theme">
+                  <button
+                    type="button"
+                    className={`sharepage__theme-btn ${cardTheme === 'dark' ? 'is-active' : ''}`}
+                    onClick={() => setCardTheme('dark')}
+                    aria-pressed={cardTheme === 'dark'}
+                  >
+                    <Moon size={14} /> Dark
+                  </button>
+                  <button
+                    type="button"
+                    className={`sharepage__theme-btn ${cardTheme === 'light' ? 'is-active' : ''}`}
+                    onClick={() => setCardTheme('light')}
+                    aria-pressed={cardTheme === 'light'}
+                  >
+                    <Sun size={14} /> Light
+                  </button>
+                </div>
+              </div>
               <canvas
                 ref={canvasRef}
                 className="sharepage__canvas"

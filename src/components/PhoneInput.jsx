@@ -6,6 +6,12 @@ import { fetchPhoneCodes, FALLBACK_PHONE_CODES } from '../lib/phoneCodes.js';
 import { validateNationalNumber } from '../lib/phoneValidation.js';
 import './PhoneInput.css';
 
+function formatNationalNumber(raw) {
+  const digits = raw.replace(/\D/g, '');
+  if (digits.length <= 3) return digits;
+  return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+}
+
 // Combines a searchable country-code (with flag) dropdown and a national
 // number field into one control. Calls onChange(combinedString, isValid)
 // on every change — e.g. onChange("+92 3211234567", true).
@@ -99,7 +105,7 @@ export default function PhoneInput({ defaultCca2 = 'PK', onChange, required = tr
           type="tel"
           className="phone-input__number"
           value={national}
-          onChange={(e) => setNational(e.target.value.replace(/[^\d\s-]/g, ''))}
+          onChange={(e) => setNational(formatNationalNumber(e.target.value))}
           onBlur={() => setTouched(true)}
           placeholder="3XX-XXXXXXX"
           required={required}

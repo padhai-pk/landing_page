@@ -49,6 +49,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--sp-4);
+    align-items: stretch;
   }
   
   .insta-popup__card {
@@ -60,6 +61,7 @@
     background: var(--bg-secondary);
     border-radius: var(--r-lg);
     padding: var(--sp-5);
+    min-height: 100%;
   }
   
 .insta-popup__avatar {
@@ -92,8 +94,15 @@
 }
   
   .insta-popup__card strong { font-size: 0.95rem; }
-  .insta-popup__card p { font-size: 0.82rem; margin: 0 0 var(--sp-2); }
-  .insta-popup__card .btn { width: 100%; }
+  .insta-popup__card p {
+    font-size: 0.82rem;
+    margin: 0;
+    flex: 1;
+  }
+  .insta-popup__card .btn {
+    width: 100%;
+    margin-top: auto;
+  }
   
   @media (max-width: 480px) {
     .insta-popup__cards { grid-template-columns: 1fr; }

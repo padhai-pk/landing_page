@@ -96,8 +96,8 @@
   color: var(--fg);
 }
 
-.waitlist__form input,
-.waitlist__form select {
+.waitlist__form label > input,
+.waitlist__form label > select {
   border: 1px solid var(--border);
   background: var(--input-bg);
   border-radius: var(--r-md);
@@ -105,8 +105,8 @@
   font-size: 0.95rem;
   color: var(--fg);
 }
-.waitlist__form input:focus,
-.waitlist__form select:focus {
+.waitlist__form label > input:focus,
+.waitlist__form label > select:focus {
   border-color: var(--accent-primary);
   outline: none;
 }

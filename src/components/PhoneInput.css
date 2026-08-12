@@ -35,12 +35,20 @@
 .phone-input__number {
   flex: 1;
   min-width: 0;
-  border: none;
+  border: none !important;
   background: none;
   outline: none;
+  box-shadow: none;
   padding: 12px 14px;
   font-size: 0.92rem;
   color: var(--fg);
+}
+.phone-input__number:focus,
+.phone-input__number:focus-visible {
+  outline: none;
+  outline-offset: 0;
+  box-shadow: none;
+  border: none !important;
 }
 
 .phone-input__error { margin: 6px 0 0; font-size: 0.78rem; color: var(--error); }

@@ -16,19 +16,19 @@ export const DEFAULT_SHARE_CAPTIONS = {
   },
   templates: {
     student: {
-      headline: '🎓 {firstName} is on the Padhai.pk VIP Student waitlist!{subjects}{waitlistId}',
+      headline: '🎓 {fullName} is on the Padhai.pk VIP Student waitlist!{subjects}{waitlistId}',
       body: '\n\nEarly access, a free 1-month Profile Boost, and learning credits at launch.',
     },
     teacher: {
-      headline: '👨‍🏫 {firstName} is a VIP Teacher on the Padhai.pk waitlist!{subjects}{waitlistId}',
+      headline: '👨‍🏫 {fullName} is a VIP Teacher on the Padhai.pk waitlist!{subjects}{waitlistId}',
       body: '\n\nHelping Pakistan learn smarter — teachers & students, one platform.',
     },
     badge: {
-      headline: '✅ {firstName} applied for the Padhai.pk Verified Badge!{subjects}{waitlistId}',
+      headline: '✅ {fullName} applied for the Padhai.pk Verified Badge!{subjects}{waitlistId}',
       body: "\n\nAmong the first verified educators on Pakistan's new learning platform.",
     },
     default: {
-      headline: '{firstName} joined the Padhai.pk waitlist!{subjects}{waitlistId}',
+      headline: '{fullName} joined the Padhai.pk waitlist!{subjects}{waitlistId}',
       body: "\n\nBe among the first on Pakistan's new learning platform.",
     },
   },

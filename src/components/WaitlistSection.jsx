@@ -151,7 +151,7 @@ export default function WaitlistSection({ subjects, onResult, activeTab, onTabCh
               <div className="waitlist__row">
                 <label>
                   Full name
-                  <input value={form.name} onChange={(e) => update('name', e.target.value)} placeholder="Fatima Ahmed" required />
+                  <input value={form.name} onChange={(e) => update('name', e.target.value)} placeholder="Your Name" required />
                 </label>
                 <label>
                   Email

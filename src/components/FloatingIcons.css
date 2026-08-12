@@ -31,3 +31,8 @@
 @media (max-width: 560px) {
   .floating-icons__item { transform: scale(0.4) rotate(var(--rotate)); }
 }
+
+@media (max-width: 400px) {
+  .floating-icons__item { display: none; }
+}
+
