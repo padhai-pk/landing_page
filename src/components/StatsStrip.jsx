@@ -56,7 +56,7 @@ export default function StatsStrip({ stats, subjects }) {
         <StatItem
           icon={<ShieldCheck size={20} />}
           value={seatsClaimed}
-          label={`Verified badge seats claimed (of ${seatsTotal})`}
+          label={`Verified badge seats claimed (of 250)`}
           delay={240}
         />
       </div>
