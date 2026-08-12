@@ -4,7 +4,7 @@ import {
   networkErrorMessage,
 } from './apiErrors.js';
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+const BASE_URL = (import.meta.env.VITE_BACKEND_URL || '').replace(/\/$/, '');
 
 async function requestBackend(method, path, body) {
   if (!BASE_URL) {

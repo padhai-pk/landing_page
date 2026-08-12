@@ -25,7 +25,8 @@ function sortByScarcestSeats(a, b) {
   return a.name.localeCompare(b.name);
 }
 
-export default function SeatProgram({ subjects }) {
+export default function SeatProgram({ subjects = [] }) {
+  const list = subjects ?? [];
   const content = useContent();
   const { eyebrow, heading, body, ctaLabel } = content.badgeProgram;
   const [query, setQuery] = useState('');
@@ -47,22 +48,22 @@ export default function SeatProgram({ subjects }) {
   // Default view: only the top 10 subjects that still have an open seat —
   // keeps this section light regardless of how many subjects exist.
   const topOpenSubjects = useMemo(() => {
-    return subjects
+    return list
       .filter((s) => (s.badgeSeatsFilled || 0) < (s.badgeSeatsMax || BADGE_SEATS_PER_SUBJECT))
       .sort(sortByScarcestSeats)
       .slice(0, TOP_N);
-  }, [subjects]);
+  }, [list]);
 
   // Search view: filters across ALL subjects (already in memory — no extra
   // fetch), capped so a broad match still renders quickly.
   const searchResults = useMemo(() => {
     if (!query.trim()) return null;
     const q = query.trim().toLowerCase();
-    return subjects
+    return list
       .filter((s) => s.name.toLowerCase().includes(q))
       .sort(sortByScarcestSeats)
       .slice(0, SEARCH_RESULTS_CAP);
-  }, [subjects, query]);
+  }, [list, query]);
 
   const isSearching = query.trim().length > 0;
   const visibleSubjects = isSearching ? searchResults : topOpenSubjects;

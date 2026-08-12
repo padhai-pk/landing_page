@@ -31,8 +31,12 @@ export default function WaitlistSection({ subjects, onResult, activeTab, onTabCh
   const [phoneResetKey, setPhoneResetKey] = useState(0);
   const [emailTouched, setEmailTouched] = useState(false);
 
-  const subjectList = subjects.length ? subjects : SUBJECTS.map((s) => ({ ...s, badgeSeatsFilled: 0, badgeSeatsMax: 2 }));
-  const categoriesInList = [...new Set(subjectList.map((s) => s.category))].length
+  const subjectList = subjects?.length
+    ? subjects
+    : subjects === null
+      ? []
+      : SUBJECTS.map((s) => ({ ...s, badgeSeatsFilled: 0, badgeSeatsMax: 2 }));
+  const categoriesInList = subjectList.length
     ? [...new Set(subjectList.map((s) => s.category))]
     : CATEGORIES;
 

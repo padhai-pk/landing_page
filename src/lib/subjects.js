@@ -1,10 +1,6 @@
-// Fallback / seed list of subjects. In production these live in the
-// Firestore `subjects` collection (see lib/waitlist.js listenToSubjects) so
-// the team can add or remove subjects at any time without a code deploy —
-// see scripts/seedSubjects.mjs to push this exact list into Firestore once.
-//
-// `id` doubles as the Firestore document id. Every subject has the same
-// number of free "Verified Badge" seats (worth Rs. 3,000 each).
+// Fallback / seed list of subjects used only when the backend bootstrap call
+// fails (offline, misconfigured VITE_BACKEND_URL, etc.). In normal operation
+// subjects come from PostgreSQL via GET /bootstrap — see lib/waitlist.js.
 
 export const BADGE_SEATS_PER_SUBJECT = 2;
 

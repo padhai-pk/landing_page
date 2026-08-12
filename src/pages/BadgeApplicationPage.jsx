@@ -28,7 +28,7 @@ export default function BadgeApplicationPage() {
   const navigate = useNavigate();
   const { badgeProgram } = content;
 
-  const [subjects, setSubjects] = useState([]);
+  const [subjects, setSubjects] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [chosenSubjectIds, setChosenSubjectIds] = useState([]);
   const [files, setFiles] = useState({ cnicFront: null, cnicBack: null, qualificationCert: null });
@@ -48,8 +48,12 @@ export default function BadgeApplicationPage() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  const subjectList = subjects.length ? subjects : SUBJECTS.map((s) => ({ ...s, badgeSeatsFilled: 0, badgeSeatsMax: BADGE_SEATS_PER_SUBJECT }));
-  const categoriesInList = [...new Set(subjectList.map((s) => s.category))].length
+  const subjectList = subjects?.length
+    ? subjects
+    : subjects === null
+      ? []
+      : SUBJECTS.map((s) => ({ ...s, badgeSeatsFilled: 0, badgeSeatsMax: BADGE_SEATS_PER_SUBJECT }));
+  const categoriesInList = subjectList.length
     ? [...new Set(subjectList.map((s) => s.category))]
     : CATEGORIES;
 

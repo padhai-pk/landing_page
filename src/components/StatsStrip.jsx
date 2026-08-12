@@ -30,17 +30,17 @@ export default function StatsStrip({ stats, subjects }) {
   const effectiveStats = hasLiveData ? stats : demoStats;
 
   const seatsClaimed = useMemo(() => {
-    if (subjects.length === 0) return demoStats.seatsClaimed;
+    if (!subjects?.length) return demoStats.seatsClaimed;
     const claimed = subjects.reduce((sum, s) => sum + (s.badgeSeatsFilled || 0), 0);
     return claimed > 0 ? claimed : demoStats.seatsClaimed;
   }, [subjects, demoStats.seatsClaimed]);
 
   const seatsTotal = useMemo(() => {
-    if (subjects.length === 0) return demoStats.seatsTotal;
+    if (!subjects?.length) return demoStats.seatsTotal;
     return subjects.reduce((sum, s) => sum + (s.badgeSeatsMax || 0), 0);
   }, [subjects, demoStats.seatsTotal]);
 
-  const subjectCount = subjects.length || Math.round(demoStats.seatsTotal / 2);
+  const subjectCount = subjects?.length || Math.round(demoStats.seatsTotal / 2);
 
   return (
     <section className="stats-strip">

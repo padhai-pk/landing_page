@@ -4,7 +4,7 @@
 import { SUBJECTS, BADGE_SEATS_PER_SUBJECT } from './subjects';
 import { getFromBackend, postToBackend } from './backend.js';
 
-const CACHE_BOOTSTRAP_KEY = 'padhai-cache-bootstrap-v1';
+const CACHE_BOOTSTRAP_KEY = 'padhai-cache-bootstrap-v2';
 const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24h
 
 function readBootstrapCache() {
@@ -28,13 +28,30 @@ function writeBootstrapCache(value) {
   }
 }
 
-function mergeSubjects(bootstrapSubjects) {
-  const byId = Object.fromEntries((bootstrapSubjects || []).map((s) => [s.id, s]));
+function normalizeSubject(s) {
+  return {
+    id: s.id,
+    name: s.name,
+    category: s.category || 'Uncategorized',
+    badgeSeatsFilled: Number(s.badgeSeatsFilled) || 0,
+    badgeSeatsMax: Number(s.badgeSeatsMax) || BADGE_SEATS_PER_SUBJECT,
+  };
+}
+
+function fallbackSubjects() {
   return SUBJECTS.map((s) => ({
     ...s,
-    badgeSeatsFilled: byId[s.id]?.badgeSeatsFilled ?? 0,
-    badgeSeatsMax: byId[s.id]?.badgeSeatsMax ?? BADGE_SEATS_PER_SUBJECT,
+    badgeSeatsFilled: 0,
+    badgeSeatsMax: BADGE_SEATS_PER_SUBJECT,
   }));
+}
+
+/** Backend PostgreSQL is the source of truth; hardcoded SUBJECTS is offline fallback only. */
+function mergeSubjects(bootstrapSubjects) {
+  if (Array.isArray(bootstrapSubjects) && bootstrapSubjects.length > 0) {
+    return bootstrapSubjects.map(normalizeSubject);
+  }
+  return fallbackSubjects();
 }
 
 const DEFAULT_STATS = { studentsCount: 0, teachersNormalCount: 0, teachersBadgeCount: 0 };

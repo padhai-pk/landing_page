@@ -15,7 +15,7 @@ import InstagramPopup from '../components/InstagramPopup.jsx';
 import { listenToBootstrap } from '../lib/waitlist.js';
 
 export default function LandingPage() {
-  const [subjects, setSubjects] = useState([]);
+  const [subjects, setSubjects] = useState(null);
   const [stats, setStats] = useState({ studentsCount: 0, teachersNormalCount: 0, teachersBadgeCount: 0 });
   const [toast, setToast] = useState(null);
   const [waitlistTab, setWaitlistTab] = useState('student');
