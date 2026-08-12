@@ -37,6 +37,26 @@
 .badgepage__head h1 { margin-bottom: 4px; }
 .badgepage__head p { margin: 0; }
 
+.badgepage__pakistan-notice {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: calc(-1 * var(--sp-4)) 0 var(--sp-8);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  background: rgba(18, 209, 111, 0.08);
+  border: 1px solid rgba(18, 209, 111, 0.28);
+  color: var(--fg-secondary);
+  font-size: 0.88rem;
+}
+.badgepage__pakistan-notice svg {
+  flex-shrink: 0;
+  color: var(--accent-primary);
+}
+.badgepage__pakistan-notice strong {
+  color: var(--accent-secondary);
+}
+
 .badgepage__grid {
   display: grid;
   grid-template-columns: 1fr 300px;
@@ -141,18 +161,28 @@
 }
 .badgepage__policies li { font-size: 0.86rem; color: var(--fg-secondary); }
 
-.badgepage__agree {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--sp-2);
+.badgepage__form label.badgepage__agree {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--sp-3);
   font-size: 0.88rem;
   font-weight: 500;
   color: var(--fg);
   background: var(--bg-secondary);
   border-radius: var(--r-md);
   padding: var(--sp-3) var(--sp-4);
+  cursor: pointer;
 }
-.badgepage__agree input { margin-top: 3px; }
+.badgepage__form label.badgepage__agree input[type='checkbox'] {
+  width: auto;
+  min-width: 16px;
+  height: 16px;
+  margin: 0;
+  flex-shrink: 0;
+  padding: 0;
+  accent-color: var(--accent-primary);
+  cursor: pointer;
+}
 
 .badgepage__error { color: var(--error); font-size: 0.85rem; margin: 0; }
 .badgepage__submit { width: 100%; margin-top: var(--sp-2); }

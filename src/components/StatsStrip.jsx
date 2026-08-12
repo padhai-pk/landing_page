@@ -48,7 +48,7 @@ export default function StatsStrip({ stats, subjects }) {
         <StatItem icon={<Users size={20} />} value={effectiveStats.studentsCount} label="Students waiting" delay={0} />
         <StatItem
           icon={<GraduationCap size={20} />}
-          value={effectiveStats.teachersNormalCount + effectiveStats.teachersBadgeCount}
+          value={effectiveStats.teachersNormalCount + effectiveStats.teachersBadgeCount + seatsClaimed}
           label="Teachers waiting"
           delay={80}
         />

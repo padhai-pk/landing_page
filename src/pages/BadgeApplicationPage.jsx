@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Award, UploadCloud, Loader2, FileText } from 'lucide-react';
+import { ArrowLeft, Award, UploadCloud, Loader2, FileText, MapPin } from 'lucide-react';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import CountryCitySelect from '../components/CountryCitySelect.jsx';
@@ -207,11 +207,16 @@ export default function BadgeApplicationPage() {
             </div>
           </div>
 
+          <p className="badgepage__pakistan-notice" role="note">
+            <MapPin size={16} />
+            The Verified Badge is currently available for <strong>Pakistan only</strong>.
+          </p>
+
           <div className="badgepage__grid">
             <form onSubmit={handleSubmit} className="badgepage__form card">
               <h3>Your details</h3>
               <div className="badgepage__row">
-                <label>Full name<input value={form.name} onChange={(e) => update('name', e.target.value)} placeholder="Fatima Ahmed" required /></label>
+                <label>Full name<input value={form.name} onChange={(e) => update('name', e.target.value)} placeholder="Your Name" required /></label>
                 <label>
                   Email
                   <input
@@ -229,7 +234,11 @@ export default function BadgeApplicationPage() {
               <div className="badgepage__row">
               <label>
                   WhatsApp / phone
-                  <PhoneInput onChange={(full, valid) => { update('phone', full); setPhoneValid(valid); }} />
+                  <PhoneInput
+                    defaultCca2="PK"
+                    lockCountryCode
+                    onChange={(full, valid) => { update('phone', full); setPhoneValid(valid); }}
+                  />
                 </label>
                 <label>
                   CNIC number
@@ -273,19 +282,19 @@ export default function BadgeApplicationPage() {
               </div>
               <h3>Qualifications</h3>
               <div className="badgepage__row">
-                <label>Highest qualification<input value={form.qualification} onChange={(e) => update('qualification', e.target.value)} placeholder="BSc Computer Science" required /></label>
-                <label>Institution<input value={form.institution} onChange={(e) => update('institution', e.target.value)} placeholder="e.g. FAST-NUCES" /></label>
+                <label>Highest qualification<input value={form.qualification} onChange={(e) => update('qualification', e.target.value)} placeholder="Highest Qualification" required /></label>
+                <label>Institution<input value={form.institution} onChange={(e) => update('institution', e.target.value)} placeholder="Institution" /></label>
               </div>
               <div className="badgepage__row">
               <label>
-                    Years of teaching experience
+                    Years of teaching experience (In Years)
                     <input
                       type="number"
                       min="0"
                       step="1"
                       value={form.experience}
                       onChange={(e) => update('experience', e.target.value)}
-                      placeholder="e.g. 2 (enter 0 if you're just starting)"
+                      placeholder="(enter 0 if you're just starting)"
                     />
                   </label>
                    <label>Intro video link (optional)<input value={form.introVideoLink} onChange={(e) => update('introVideoLink', e.target.value)} placeholder="YouTube (unlisted) or Drive link" /></label>

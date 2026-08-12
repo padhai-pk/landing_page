@@ -15,7 +15,8 @@ function formatNationalNumber(raw) {
 // Combines a searchable country-code (with flag) dropdown and a national
 // number field into one control. Calls onChange(combinedString, isValid)
 // on every change — e.g. onChange("+92 3211234567", true).
-export default function PhoneInput({ defaultCca2 = 'PK', onChange, required = true }) {
+// Pass lockCountryCode to prevent changing the dial code (e.g. Pakistan-only flows).
+export default function PhoneInput({ defaultCca2 = 'PK', onChange, required = true, lockCountryCode = false }) {
   const [codes, setCodes] = useState(FALLBACK_PHONE_CODES);
   const [selected, setSelected] = useState(
     FALLBACK_PHONE_CODES.find((c) => c.cca2 === defaultCca2) || FALLBACK_PHONE_CODES[0]
@@ -31,6 +32,13 @@ export default function PhoneInput({ defaultCca2 = 'PK', onChange, required = tr
 
   useEffect(() => {
     let cancelled = false;
+    if (lockCountryCode) {
+      const pk = FALLBACK_PHONE_CODES.find((c) => c.cca2 === defaultCca2)
+        || FALLBACK_PHONE_CODES.find((c) => c.cca2 === 'PK')
+        || FALLBACK_PHONE_CODES[0];
+      setSelected(pk);
+      return undefined;
+    }
     fetchPhoneCodes()
       .then((list) => {
         if (cancelled || !list.length) return;
@@ -43,9 +51,18 @@ export default function PhoneInput({ defaultCca2 = 'PK', onChange, required = tr
       });
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [lockCountryCode]);
 
   useEffect(() => {
+    if (!lockCountryCode) return;
+    setOpen(false);
+    const pk = codes.find((c) => c.cca2 === defaultCca2)
+      || codes.find((c) => c.cca2 === 'PK');
+    if (pk) setSelected(pk);
+  }, [lockCountryCode, defaultCca2, codes]);
+
+  useEffect(() => {
+    if (lockCountryCode) return undefined;
     function onClickOutside(e) {
       if (
         rootRef.current && !rootRef.current.contains(e.target) &&
@@ -56,7 +73,7 @@ export default function PhoneInput({ defaultCca2 = 'PK', onChange, required = tr
     }
     document.addEventListener('mousedown', onClickOutside);
     return () => document.removeEventListener('mousedown', onClickOutside);
-  }, []);
+  }, [lockCountryCode]);
 
   const validation = useMemo(
     () => validateNationalNumber(national, selected?.cca2),
@@ -86,20 +103,31 @@ export default function PhoneInput({ defaultCca2 = 'PK', onChange, required = tr
   return (
     <div className="phone-input" ref={rootRef}>
       <div className={`phone-input__field ${showError ? 'has-error' : ''}`} ref={triggerRef}>
-        <button
-          type="button"
-          className="phone-input__code-trigger"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-        >
-          {selected?.flagEmoji ? (
-            <span className="phone-input__flag-emoji">{selected.flagEmoji}</span>
-          ) : (
-            <img className="phone-input__flag-img" src={selected?.flag} alt="" />
-          )}
-          <span className="phone-input__dial-code">{selected?.dialCode}</span>
-          <ChevronDown size={14} className={`phone-input__chevron ${open ? 'is-open' : ''}`} />
-        </button>
+        {lockCountryCode ? (
+          <span className="phone-input__code-locked" aria-label="Country code locked to Pakistan">
+            {selected?.flagEmoji ? (
+              <span className="phone-input__flag-emoji">{selected.flagEmoji}</span>
+            ) : (
+              <img className="phone-input__flag-img" src={selected?.flag} alt="" />
+            )}
+            <span className="phone-input__dial-code">{selected?.dialCode}</span>
+          </span>
+        ) : (
+          <button
+            type="button"
+            className="phone-input__code-trigger"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+          >
+            {selected?.flagEmoji ? (
+              <span className="phone-input__flag-emoji">{selected.flagEmoji}</span>
+            ) : (
+              <img className="phone-input__flag-img" src={selected?.flag} alt="" />
+            )}
+            <span className="phone-input__dial-code">{selected?.dialCode}</span>
+            <ChevronDown size={14} className={`phone-input__chevron ${open ? 'is-open' : ''}`} />
+          </button>
+        )}
 
         <input
           type="tel"
@@ -114,7 +142,7 @@ export default function PhoneInput({ defaultCca2 = 'PK', onChange, required = tr
 
       {showError && <p className="phone-input__error">{validation.reason}</p>}
 
-      {open && style && createPortal(
+      {!lockCountryCode && open && style && createPortal(
         <div className={`phone-input__panel phone-input__panel--${placement}`} style={style}>
           <div className="phone-input__search">
             <Search size={15} />

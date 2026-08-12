@@ -76,7 +76,7 @@
     "heading": "Five simple steps. No scams, no guesswork.",
     "steps": [
       { "icon": "FileEdit", "title": "Post what you need", "text": "Subject, level, budget, and the kind of teacher you're looking for. Takes less than a minute." },
-      { "icon": "Send", "title": "Teachers send proposals", "text": "Verified teachers respond with their price and a short pitch \u2014 you choose who feels right." },
+      { "icon": "Send", "title": "Teachers send proposals", "text": "Teachers respond with their price and a short pitch \u2014 you choose who feels right." },
       { "icon": "Video", "title": "Try a free demo, in-app", "text": "An optional free demo session, right inside Padhai.pk, before anyone commits to anything." },
       { "icon": "Landmark", "title": "Pay into a safe escrow", "text": "JazzCash, EasyPaisa, or card. Your money stays protected until the session is completed \u2014 no exceptions." },
       { "icon": "BadgeCheck", "title": "Teacher gets paid, you both review", "text": "Payment is released automatically once the session is confirmed. Both sides leave a review for the next person." }
@@ -90,8 +90,8 @@
       { "icon": "ArrowLeftRight", "title": "One platform, both sides", "text": "Students post what they need to learn. Teachers respond with proposals. You match on your own terms \u2014 not through a random Facebook post." },
       { "icon": "PenLine", "title": "Posts & proposals", "text": "Subject, budget, and requirement every match. Teachers pitch with their price and a short introduction." },
       { "icon": "TrendingUp", "title": "Get seen faster", "text": "Teachers can boost their profile to rank higher in search. Students can boost an urgent post to get proposals sooner." },
-      { "icon": "Star", "title": "More proposals when you need them", "text": "A simple monthly plan gives active teachers extra proposals once they've used up their free monthly quota." },
-      { "icon": "Video", "title": "Live sessions, right in the app", "text": "Demo classes and paid sessions happen over in-app video \u2014 no separate app, no sharing personal numbers with strangers." },
+      { "icon": "Star", "title": "More proposals when you need them", "text": "A simple monthly plan gives teachers extra proposals once they've used up their free monthly quota." },
+      { "icon": "Video", "title": "Live sessions, right on the Platform", "text": "Demo classes and paid sessions happen over on-platfom video \u2014 no separate app, no sharing personal numbers with strangers." },
       { "icon": "Lock", "title": "Your money stays protected", "text": "A student's payment is held safely and only released to the teacher once a session is confirmed complete." },
       { "icon": "Landmark", "title": "Get paid directly", "text": "Teachers link a bank account or mobile wallet straight to the platform \u2014 earnings come to you, with no middlemen." },
       { "icon": "Wallet", "title": "JazzCash \u00b7 EasyPaisa \u00b7 Card \u00b7 Bank Transfer", "text": "Pay however you already pay in real life. No foreign card, no complicated setup." }
@@ -106,8 +106,7 @@
     "documentsRequired": [
       "CNIC \u2014 front and back (clear photo or scan)",
       "Your highest qualification certificate or degree",
-      "A short 30\u201360 second introduction video",
-      "Optional: a 2\u20135 minute sample teaching clip"
+      "An Optional short 30\u201360 second introduction video"
     ],
     "policies": [
       "I confirm all information and documents I submit are accurate and belong to me.",
@@ -115,6 +114,7 @@
       "I understand sharing contact details with students outside the Padhai.pk platform goes against our Terms of Service.",
       "I understand a free badge seat is limited to the first 2 approved teachers per subject, and isn't guaranteed until reviewed.",
       "I agree the Verified Badge is valid for 1 year, and can be renewed afterward with a quick re-verification.",
+      "I understand that the Verified Badge is not a guarantee of success, and If my documents are not accepted, I will not be eligible for the badge.",
       "I agree to a short verification call with the Padhai.pk team.",
       "I understand that if I don't log into the app within 3 days of launch, my free badge claim may be released to someone else."
     ]
@@ -122,7 +122,7 @@
   "faqs": [
     {
       "q": "What exactly is Padhai.pk?",
-      "a": "A safe way for students and teachers to find each other. Students post what they want to learn, verified teachers send proposals, and paid sessions happen inside the app over video \u2014 with your money held safely until the session is actually done."
+      "a": "A safe way for students and teachers to find each other. Students post what they want to learn, teachers can send proposals, and paid sessions happen inside the app over video \u2014 with your money held safely until the session is actually done."
     },
     {
       "q": "Is the Verified Badge really free?",
@@ -139,7 +139,48 @@
     {
       "q": "What if my subject's badge seats are already full?",
       "a": "You're automatically added to our general teacher waitlist, and we'll email you the moment a seat opens up or a new round starts. You're also welcome to apply again under a different subject."
-    }
+    },
+      {
+        "q": "Is Padhai.pk legit, or could I get scammed like on Facebook/WhatsApp tutoring groups?",
+        "a": "Padhai.pk is a registered business under FBR and SECP compliance \u2014 not an anonymous page or a personal WhatsApp number, but a legally accountable company. On top of that, any payment you make is held by the platform and only released once your session is complete and you're satisfied, so you're never sending money to a stranger and just hoping for the best."
+      },
+      {
+        "q": "How do I know a teacher is actually qualified and not just a random profile?",
+        "a": "You get to choose. Teachers can apply to become verified, which means their CNIC and qualification documents are reviewed before they get a verified badge. Not every teacher chooses to verify \u2014 it's optional \u2014 so as a student you can see who's verified and who isn't, and decide for yourself based on their profile, ratings, and reviews."
+      },
+      {
+        "q": "If I pay before the class, how do I know I won't lose my money?",
+        "a": "Your payment doesn't go to the teacher right away \u2014 it's held securely by the platform as soon as you pay, and only released to the teacher after your session is completed successfully. This protects you because your money isn't released on trust alone, and it protects the teacher too, since payment is already secured and waiting once they've delivered the session."
+      },
+      {
+        "q": "What if the teacher doesn't show up, or the session isn't what was promised?",
+        "a": "You have up to 6 hours after the session to file a dispute if the teacher didn't show up or didn't deliver what was promised. Payment isn't automatically released against your wishes during that window. The teacher also gets a chance to explain their side before anything is decided, so the process is fair to both sides."
+      },
+      {
+        "q": "Is there a free demo class, and is it actually free?",
+        "a": "Yes, and it's completely optional. A student can request a demo class from a teacher, and both sides mutually agree on it \u2014 the platform just provides the tools to make that demo session happen. There's no hidden charge, and no pressure to take one if you'd rather just book a session directly."
+      },
+      {
+        "q": "As a teacher, do I have to pay just to send proposals to students?",
+        "a": "No \u2014 every teacher gets free proposals to send to students at no cost. Proposal bundles are only for teachers who want an edge over others and want to send more proposals than their free allowance to reach more students faster. It's an optional way to grow, not something you're required to pay for just to participate."
+      },
+      {
+        "q": "As a teacher, will I actually get paid, and how long will it take?",
+        "a": "As soon as your session is completed and no dispute is raised, your payment is released to you instantly. There's no waiting for a batch cycle or chasing the platform for your earnings \u2014 completion plus no dispute means the money is yours right away."
+      },
+      {
+        "q": "Does the app work with JazzCash/EasyPaisa, or do I need a bank card?",
+        "a": "The platform works with any local wallet, bank transfers, and cards \u2014 so whether you use JazzCash, EasyPaisa, a bank account, or a debit/credit card, you're covered. You're not locked into one payment method."
+      },
+      {
+        "q": "What happens to my personal documents (CNIC, degree) if I apply for verification?",
+        "a": "Since verification is optional and teacher-initiated, your documents are only submitted if and when you choose to apply for the verified badge. They're reviewed solely to confirm your identity and qualifications match your profile, giving students confidence in your credentials \u2014 it's a tool to help you get chosen, not a requirement to be on the platform at all."
+      },
+      {
+        "q": "What if a teacher and student just exchange numbers and skip the app after the demo?",
+        "a": "Everything valuable about being on Padhai.pk lives only inside it. Teachers keep their review history, proposal visibility, and instant, secured payment on every completed session \u2014 all of which disappear off-platform. Students keep escrow protection, a 6-hour dispute window, and a documented session history. Staying isn't enforced by threats; it's simply where the protection, reputation, and reliable payment actually exist."
+      }
+    
   ],
   "footer": {
     "tagline": "Padhna ho ya Padhana, sirf Padhai.pk pr aana.",
