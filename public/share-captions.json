@@ -1,6 +1,7 @@
 {
-  "_comment": "Edit this file to change social share captions. Placeholders: {fullName}, {firstName}, {subjects}, {waitlistId}, {siteUrl}, {instagram}, {facebook}, {linkedin}",
-  "siteUrl": "https://padhai.pk",
+  "_comment": "Edit this file to change social share captions. Placeholders: {fullName}, {firstName}, {subjects}, {waitlistId}, {siteUrl}, {websiteLabel}, {instagram}, {facebook}, {linkedin}",
+  "siteUrl": "https://www.padhai.pk",
+  "websiteLabel": "www.Padhai.pk",
   "socialHandles": {
     "instagram": "@padhai.pk",
     "facebook": "@Padhai",
@@ -8,7 +9,7 @@
   },
   "blocks": {
     "tagline": "\n\nPadhna ho ya Padhana, sirf Padhai.pk pr aana!",
-    "cta": "\n\nJoin the waitlist → {siteUrl}",
+    "cta": "\n\n👉 Join the waitlist at {websiteLabel}\n{siteUrl}",
     "handles": "\n\nFollow {instagram} on Instagram · {facebook} on Facebook · {linkedin} on LinkedIn",
     "subjectsLine": "\n {subjects}",
     "waitlistIdLine": "\nMy waitlist ID: {waitlistId}"

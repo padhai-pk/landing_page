@@ -1,0 +1,5 @@
+.country-city-select__locked {
+  cursor: default;
+  color: var(--fg-secondary);
+  background: var(--bg-secondary);
+}

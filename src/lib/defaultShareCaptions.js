@@ -1,7 +1,8 @@
 // Fallback if /share-captions.json fails to load — keep in sync with public/share-captions.json.
 
 export const DEFAULT_SHARE_CAPTIONS = {
-  siteUrl: 'https://padhai.pk',
+  siteUrl: 'https://www.padhai.pk',
+  websiteLabel: 'www.Padhai.pk',
   socialHandles: {
     instagram: '@padhai.pk',
     facebook: 'Padhai.pk',
@@ -9,7 +10,7 @@ export const DEFAULT_SHARE_CAPTIONS = {
   },
   blocks: {
     tagline: '\n\nPadhna ho ya Padhana, sirf Padhai.pk pr aana! 🎓',
-    cta: '\n\nJoin the waitlist → {siteUrl}',
+    cta: '\n\n👉 Join the waitlist at {websiteLabel}\n{siteUrl}',
     handles: '\n\nFollow {instagram} on Instagram · {facebook} on Facebook · {linkedin} on LinkedIn',
     subjectsLine: '\n📚 {subjects}',
     waitlistIdLine: '\n🆔 {waitlistId}',

@@ -16,7 +16,7 @@ import { validateDocFile, ACCEPTED_DOC_INPUT_ATTR } from '../lib/fileValidation.
 import { isValidEmail, isValidCnic, formatCnicInput,isValidExperience } from '../lib/validators.js';
 
 const emptyForm = {
-  name: '', email: '', phone: '', country: '', city: '', cnicNumber: '',
+  name: '', email: '', phone: '', country: 'Pakistan', city: '', cnicNumber: '',
   qualification: '', institution: '', experience: '',
   bio: '', introVideoLink: '',
 };
@@ -109,6 +109,14 @@ export default function BadgeApplicationPage() {
     }
     if (!isValidExperience(form.experience)) {
       setError('Experience must be a number (e.g. 2).');
+      return;
+    }
+    if (!form.city.trim()) {
+      setError('Please select your city.');
+      return;
+    }
+    if (form.country !== 'Pakistan') {
+      setError('Verified Badge applications are currently available in Pakistan only.');
       return;
     }
     if (chosenSubjectIds.length === 0) {
@@ -244,6 +252,7 @@ export default function BadgeApplicationPage() {
                   city={form.city}
                   onCountryChange={(v) => update('country', v)}
                   onCityChange={(v) => update('city', v)}
+                  fixedCountry="Pakistan"
                 />
               </div>
               <div className="badgepage__row">

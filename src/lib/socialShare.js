@@ -35,6 +35,7 @@ function deepMergeCaptions(base, patch) {
     blocks: { ...base.blocks, ...patch.blocks },
     templates: { ...base.templates, ...patch.templates },
     shareMessages: { ...base.shareMessages, ...patch.shareMessages },
+    websiteLabel: patch.websiteLabel ?? base.websiteLabel,
   };
 }
 
@@ -59,6 +60,7 @@ export function buildShareCaption(
   const blocks = config.blocks || DEFAULT_SHARE_CAPTIONS.blocks;
   const handles = config.socialHandles || DEFAULT_SHARE_CAPTIONS.socialHandles;
   const siteUrl = config.siteUrl || DEFAULT_SHARE_CAPTIONS.siteUrl;
+  const websiteLabel = config.websiteLabel || DEFAULT_SHARE_CAPTIONS.websiteLabel || 'www.Padhai.pk';
 
   const subjectList = subjects.filter(Boolean).slice(0, 3);
   const subjectsBlock = subjectList.length
@@ -76,6 +78,7 @@ export function buildShareCaption(
     subjects: subjectsBlock,
     waitlistId: waitlistBlock,
     siteUrl,
+    websiteLabel,
     instagram: handles.instagram,
     facebook: handles.facebook,
     linkedin: handles.linkedin,
@@ -149,24 +152,14 @@ export async function tryNativeShare(blob, caption, config = DEFAULT_SHARE_CAPTI
 }
 
 /**
- * Open the best available composer for each platform.
- * Returns { copied, opened, method, message } for UI feedback.
+ * Open the native composer for each platform directly (no OS share sheet).
+ * Downloads the card and copies the caption so the user can attach/paste in-app.
  */
 export async function openPlatformShare(platform, { blob, caption, social = {}, config = DEFAULT_SHARE_CAPTIONS }) {
   const siteUrl = siteUrlFromConfig(config);
   const encodedCaption = encodeURIComponent(caption);
   const encodedUrl = encodeURIComponent(siteUrl);
   const copied = await copyCaption(caption);
-
-  const nativeOk = await tryNativeShare(blob, caption, config);
-  if (nativeOk) {
-    return {
-      copied,
-      opened: true,
-      method: 'native',
-      message: msg(config, 'platformNative', 'Share sheet opened with your card and caption.'),
-    };
-  }
 
   downloadBlob(blob);
 
@@ -186,10 +179,7 @@ export async function openPlatformShare(platform, { blob, caption, social = {}, 
 
     case 'facebook': {
       if (isMobile()) {
-        window.open('https://m.facebook.com/composer/', '_blank', 'noopener,noreferrer');
-        setTimeout(() => {
-          window.location.href = 'fb://composer';
-        }, 500);
+        window.location.href = 'fb://composer';
       } else {
         const url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedCaption}`;
         window.open(url, '_blank', 'noopener,noreferrer,width=600,height=720');
@@ -205,11 +195,13 @@ export async function openPlatformShare(platform, { blob, caption, social = {}, 
     }
 
     case 'instagram': {
-      const igUrl = social.instagram || 'https://www.instagram.com/padhai.pk/';
       if (isMobile()) {
-        window.location.href = 'instagram://library';
-        setTimeout(() => window.open(igUrl, '_blank', 'noopener,noreferrer'), 800);
+        window.location.href = 'instagram-stories://share';
+        window.setTimeout(() => {
+          window.location.href = 'instagram://story-camera';
+        }, 400);
       } else {
+        const igUrl = social.instagram || 'https://www.instagram.com/padhai.pk/';
         window.open(igUrl, '_blank', 'noopener,noreferrer');
       }
       return {
@@ -217,8 +209,8 @@ export async function openPlatformShare(platform, { blob, caption, social = {}, 
         opened: true,
         method: 'instagram',
         message: copied
-          ? msg(config, 'instagramCopied', 'Caption copied! Open Instagram to post.')
-          : msg(config, 'instagramOpened', 'Card downloaded! Open Instagram to post.'),
+          ? msg(config, 'instagramCopied', 'Card saved & caption copied! Instagram Stories is opening — attach your card and paste the caption.')
+          : msg(config, 'instagramOpened', 'Card saved! Instagram Stories is opening — attach your card and tag @padhai.pk.'),
       };
     }
 

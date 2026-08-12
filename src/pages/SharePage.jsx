@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Download, Facebook, Instagram, Linkedin, Share2, Camera, X, Gift, ShieldCheck, PartyPopper, Sun, Moon } from 'lucide-react';
+import { Download, Facebook, Instagram, Linkedin, Share2, Gift, ShieldCheck, PartyPopper, Sun, Moon } from 'lucide-react';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import { drawShareCard, renderShareCardBlob } from '../lib/shareCard.js';
@@ -18,7 +18,6 @@ export default function SharePage() {
   const [busyPlatform, setBusyPlatform] = useState('');
   const [note, setNote] = useState('');
   const [avatarImg, setAvatarImg] = useState(null);
-  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState('');
   const [cardTheme, setCardTheme] = useState('dark');
   const [captionsConfig, setCaptionsConfig] = useState(null);
 
@@ -55,14 +54,6 @@ export default function SharePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, avatarImg, cardTheme]);
 
-  // Revoke the object URL when replaced/unmounted — the photo only ever
-  // lives in this browser tab, it's never uploaded anywhere.
-  useEffect(() => {
-    return () => {
-      if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
-    };
-  }, [avatarPreviewUrl]);
-
   if (!state) {
     return (
       <>
@@ -94,15 +85,9 @@ export default function SharePage() {
     const img = new Image();
     img.onload = () => {
       setAvatarImg(img);
-      setAvatarPreviewUrl(url);
+      URL.revokeObjectURL(url);
     };
     img.src = url;
-  }
-
-  function removeAvatar() {
-    setAvatarImg(null);
-    setAvatarPreviewUrl('');
-    if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
   function handleCanvasClick(e) {
@@ -125,9 +110,11 @@ export default function SharePage() {
     a.download = 'padhai-pk-card.png';
     a.click();
     URL.revokeObjectURL(url);
+    setNote('Card downloaded to your device.');
   }
 
   async function handleNativeShare() {
+    setNote('');
     const config = captionsConfig || (await loadShareCaptions());
     const blob = await renderShareCardBlob(cardArgs);
     const caption = buildShareCaption({
@@ -143,7 +130,7 @@ export default function SharePage() {
       return;
     }
 
-    setNote(config.shareMessages?.nativeUnsupported || 'Native sharing isn\'t supported — use the buttons below.');
+    setNote(config.shareMessages?.nativeUnsupported || 'Native sharing isn\'t supported on this browser — use a platform button below.');
   }
 
   async function handlePlatformShare(platform) {
@@ -190,104 +177,96 @@ export default function SharePage() {
               )}
             </div>
           )}
+        </div>
 
-          <div className="sharepage__card-shell">
-            <div className="sharepage__card-toolbar">
-              <div className="sharepage__avatar-control">
-                <button type="button" className="sharepage__avatar-btn" onClick={() => fileInputRef.current?.click()}>
-                  {avatarPreviewUrl ? (
-                    <img src={avatarPreviewUrl} alt="Your photo" className="sharepage__avatar-thumb" />
-                  ) : (
-                    <Camera size={16} />
-                  )}
-                  {avatarPreviewUrl ? 'Change photo' : 'Add Photo'}
+        <div className="sharepage__card-stage">
+          <div className="sharepage__card-wrap">
+            <div className="sharepage__card-theme" aria-label="Card color theme">
+              <span className="sharepage__card-theme-label">Card theme</span>
+              <div className="sharepage__theme-toggle" role="group" aria-label="Card color theme">
+                <button
+                  type="button"
+                  className={`sharepage__theme-btn ${cardTheme === 'dark' ? 'is-active' : ''}`}
+                  onClick={() => setCardTheme('dark')}
+                  aria-pressed={cardTheme === 'dark'}
+                >
+                  <Moon size={14} /> Dark
                 </button>
-                {avatarPreviewUrl && (
-                  <button type="button" className="sharepage__avatar-remove" onClick={removeAvatar} aria-label="Remove photo">
-                    <X size={14} />
-                  </button>
-                )}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={handleAvatarPick}
-                />
+                <button
+                  type="button"
+                  className={`sharepage__theme-btn ${cardTheme === 'light' ? 'is-active' : ''}`}
+                  onClick={() => setCardTheme('light')}
+                  aria-pressed={cardTheme === 'light'}
+                >
+                  <Sun size={14} /> Light
+                </button>
               </div>
-
-              <button type="button" className="btn btn-primary btn-sm sharepage__top-share" onClick={handleNativeShare}>
-                <Share2 size={15} /> Share now
-              </button>
             </div>
-            <p className="sharepage__avatar-note">Your photo is only used to preview this card in your browser — it's never uploaded or sent to Padhai.pk.</p>
-
-            <div className="sharepage__card-wrap">
-              <div className="sharepage__card-theme" aria-label="Card color theme">
-                <span className="sharepage__card-theme-label">Card theme</span>
-                <div className="sharepage__theme-toggle" role="group" aria-label="Card color theme">
-                  <button
-                    type="button"
-                    className={`sharepage__theme-btn ${cardTheme === 'dark' ? 'is-active' : ''}`}
-                    onClick={() => setCardTheme('dark')}
-                    aria-pressed={cardTheme === 'dark'}
-                  >
-                    <Moon size={14} /> Dark
-                  </button>
-                  <button
-                    type="button"
-                    className={`sharepage__theme-btn ${cardTheme === 'light' ? 'is-active' : ''}`}
-                    onClick={() => setCardTheme('light')}
-                    aria-pressed={cardTheme === 'light'}
-                  >
-                    <Sun size={14} /> Light
-                  </button>
-                </div>
-              </div>
-              <canvas
-                ref={canvasRef}
-                className="sharepage__canvas"
-                onClick={handleCanvasClick}
-                role="button"
-                aria-label="Tap your photo to upload"
-              />
-            </div>
+            <canvas
+              ref={canvasRef}
+              className="sharepage__canvas"
+              onClick={handleCanvasClick}
+              role="button"
+              aria-label="Tap your photo to upload"
+            />
           </div>
 
-          <p className="sharepage__boost-rules">
-            <Gift size={14} /> Tap a platform below — your caption is ready with @padhai.pk handles. Post publicly, then our admin team will review and approve your Profile Boost manually.
+          <p className="sharepage__promo-highlight">
+            <Gift size={16} />
+            <span>
+              <strong>Share &amp; get 1 Month FREE Profile Boost</strong>
+              <em>Mention @padhai.pk on Facebook, Instagram or LinkedIn</em>
+            </span>
           </p>
 
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={handleAvatarPick}
+          />
+        </div>
+
+        <div className="container sharepage__inner">
           {note && <p className="sharepage__note">{note}</p>}
 
-          <div className="sharepage__actions">
-            <button
-              type="button"
-              className="btn btn-secondary-outline btn-md"
-              disabled={busyPlatform === 'facebook'}
-              onClick={() => handlePlatformShare('facebook')}
-            >
-              <Facebook size={16} /> Facebook
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary-outline btn-md"
-              disabled={busyPlatform === 'instagram'}
-              onClick={() => handlePlatformShare('instagram')}
-            >
-              <Instagram size={16} /> Instagram
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary-outline btn-md"
-              disabled={busyPlatform === 'linkedin'}
-              onClick={() => handlePlatformShare('linkedin')}
-            >
-              <Linkedin size={16} /> LinkedIn
-            </button>
-            <button type="button" className="btn btn-ghost btn-md" onClick={handleDownload}>
-              <Download size={16} /> Download only (Share myself)
-            </button>
+          <div className="sharepage__btn-stack">
+            <div className="sharepage__actions sharepage__actions--platforms">
+              <button
+                type="button"
+                className="sharepage__platform-btn"
+                disabled={busyPlatform === 'facebook'}
+                onClick={() => handlePlatformShare('facebook')}
+              >
+                <Facebook size={16} /> Facebook
+              </button>
+              <button
+                type="button"
+                className="sharepage__platform-btn"
+                disabled={busyPlatform === 'instagram'}
+                onClick={() => handlePlatformShare('instagram')}
+              >
+                <Instagram size={16} /> Instagram
+              </button>
+              <button
+                type="button"
+                className="sharepage__platform-btn"
+                disabled={busyPlatform === 'linkedin'}
+                onClick={() => handlePlatformShare('linkedin')}
+              >
+                <Linkedin size={16} /> LinkedIn
+              </button>
+            </div>
+
+            <div className="sharepage__actions sharepage__actions--utility">
+              <button type="button" className="sharepage__utility-btn" onClick={handleDownload}>
+                <Download size={16} /> Download
+              </button>
+              <button type="button" className="sharepage__utility-btn" onClick={handleNativeShare}>
+                <Share2 size={16} /> Share now
+              </button>
+            </div>
           </div>
 
           <p className="sharepage__admin-note">

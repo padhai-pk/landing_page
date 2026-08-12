@@ -462,7 +462,7 @@ function renderCard(ctx, W, H, opts) {
   let y = 196;
 
   // Avatar — interactive preview shows upload affordance; export shows initial only.
-  const avatarR = 88;
+  const avatarR = 105;
   const cx = W / 2;
   const cy = y + avatarR;
   ctx.save();
@@ -646,29 +646,14 @@ function renderCard(ctx, W, H, opts) {
   y += jLines.length * 30 + 10;
   ctx.font = '700 24px "Poppins", sans-serif';
   ctx.fillStyle = theme.accent;
-  const ctaLabel = 'padhai.pk';
+  const ctaLabel = 'www.padhai.pk';
   const ctaW = ctx.measureText(ctaLabel).width;
   ctx.fillText(ctaLabel, cx + 14, y);
-  iconArrowRight(ctx, cx + 14 + ctaW / 2 + 8, y - 15, 20, theme.accent);
   ctx.textAlign = 'left';
   y += 44;
 
-  // Share-to-earn promo banner
-  ctx.textAlign = 'center';
-  const promoGrad = ctx.createLinearGradient(M, 0, W - M, 0);
-  promoGrad.addColorStop(0, theme.accent);
-  promoGrad.addColorStop(1, theme.accentStrong);
-  ctx.fillStyle = promoGrad;
-  roundRect(ctx, M, y, CW, 114, 22);
-  ctx.fill();
-  ctx.fillStyle = theme.accentText;
-  ctx.font = '700 28px "Poppins", sans-serif';
-  ctx.fillText('Share & get 1 Month FREE Profile Boost', cx + 14, y + 44);
-  ctx.font = '500 22px "Poppins", sans-serif';
-  ctx.fillText('Mention @padhai.pk on Facebook, Instagram or LinkedIn', cx, y + 80);
-  y += 114 + 34;
-
   // Footer
+  ctx.textAlign = 'center';
   ctx.font = '400 24px "Poppins", sans-serif';
   ctx.fillStyle = theme.textMuted;
   ctx.fillText('Padhna ho ya Padhana, sirf Padhai.pk pr aana.', cx, y);

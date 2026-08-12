@@ -4,6 +4,7 @@ import { useContent } from '../lib/content.jsx';
 import './InstagramPopup.css';
 
 const VIEW_THRESHOLD = 0.12;
+const SCROLL_DELTA = 4;
 
 function isBadgeSectionInView(el) {
   if (!el) return false;
@@ -41,15 +42,36 @@ function InstaProfileAvatar({ profileImage, handle }) {
   );
 }
 
-// Shows whenever the Seat Program section (#badge-program) scrolls into view.
-// Closing it hides it until the section leaves view and the user scrolls back.
+// Shows when the Seat Program section (#badge-program) scrolls into view
+// while the user is scrolling downward — not when scrolling back up.
 export default function InstagramPopup() {
   const content = useContent();
   const [visible, setVisible] = useState(false);
   const dismissedWhileInViewRef = useRef(false);
+  const scrollingDownRef = useRef(true);
+  const lastScrollYRef = useRef(0);
 
   useEffect(() => {
     let io = null;
+    lastScrollYRef.current = window.scrollY;
+
+    function updateScrollDirection() {
+      const y = window.scrollY;
+      if (y > lastScrollYRef.current + SCROLL_DELTA) {
+        scrollingDownRef.current = true;
+      } else if (y < lastScrollYRef.current - SCROLL_DELTA) {
+        scrollingDownRef.current = false;
+      }
+      lastScrollYRef.current = y;
+    }
+
+    function onScroll() {
+      updateScrollDirection();
+      const target = document.getElementById('badge-program');
+      if (!scrollingDownRef.current && target && isBadgeSectionInView(target)) {
+        setVisible(false);
+      }
+    }
 
     function attachObserver() {
       const target = document.getElementById('badge-program');
@@ -58,7 +80,9 @@ export default function InstagramPopup() {
       io = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            if (!dismissedWhileInViewRef.current) setVisible(true);
+            if (scrollingDownRef.current && !dismissedWhileInViewRef.current) {
+              setVisible(true);
+            }
           } else {
             dismissedWhileInViewRef.current = false;
           }
@@ -73,9 +97,11 @@ export default function InstagramPopup() {
     }
 
     attachObserver();
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     function onNavigateToBadgeSection() {
       if (window.location.hash !== '#badge-program') return;
+      scrollingDownRef.current = true;
       window.setTimeout(() => {
         const target = document.getElementById('badge-program');
         if (isBadgeSectionInView(target) && !dismissedWhileInViewRef.current) {
@@ -89,6 +115,7 @@ export default function InstagramPopup() {
 
     return () => {
       io?.disconnect();
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('hashchange', onNavigateToBadgeSection);
     };
   }, []);
