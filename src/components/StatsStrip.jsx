@@ -31,7 +31,7 @@ export default function StatsStrip({ stats, subjects }) {
 
   const seatsClaimed = useMemo(() => {
     if (!subjects?.length) return demoStats.seatsClaimed;
-    const claimed = subjects.reduce((sum, s) => sum + (s.badgeSeatsFilled || 0), 0);
+    const claimed = stats.teachersBadgeCount ;
     return claimed > 0 ? claimed : demoStats.seatsClaimed;
   }, [subjects, demoStats.seatsClaimed]);
 
@@ -48,7 +48,7 @@ export default function StatsStrip({ stats, subjects }) {
         <StatItem icon={<Users size={20} />} value={effectiveStats.studentsCount} label="Students waiting" delay={0} />
         <StatItem
           icon={<GraduationCap size={20} />}
-          value={effectiveStats.teachersNormalCount + effectiveStats.teachersBadgeCount + seatsClaimed}
+          value={effectiveStats.teachersNormalCount + seatsClaimed}
           label="Teachers waiting"
           delay={80}
         />
