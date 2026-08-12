@@ -4,20 +4,31 @@
 import { DEFAULT_SHARE_CAPTIONS } from './defaultShareCaptions.js';
 
 let captionsCache = null;
+let captionsCacheAt = 0;
 let captionsPromise = null;
+const CAPTIONS_CACHE_MAX_AGE_MS = 60 * 60 * 1000; // 1 hour
 
-/** Load share-captions.json once per session (with built-in fallback). */
+/** Load share-captions.json with a 1-hour in-memory cache (always revalidates after expiry). */
 export function loadShareCaptions() {
-  if (captionsCache) return Promise.resolve(captionsCache);
+  if (captionsCache && (Date.now() - captionsCacheAt) < CAPTIONS_CACHE_MAX_AGE_MS) {
+    return Promise.resolve(captionsCache);
+  }
+  captionsCache = null;
+
   if (!captionsPromise) {
-    captionsPromise = fetch('/share-captions.json', { cache: 'no-store' })
+    captionsPromise = fetch('/share-captions.json', {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
+    })
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('share-captions.json not found'))))
       .then((data) => {
         captionsCache = deepMergeCaptions(DEFAULT_SHARE_CAPTIONS, data);
+        captionsCacheAt = Date.now();
         return captionsCache;
       })
       .catch(() => {
         captionsCache = DEFAULT_SHARE_CAPTIONS;
+        captionsCacheAt = Date.now();
         return captionsCache;
       })
       .finally(() => {

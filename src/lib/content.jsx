@@ -13,7 +13,10 @@ export function ContentProvider({ children }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/content.json', { cache: 'no-store' })
+    fetch('/content.json', {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
+    })
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error('content.json not found'))))
       .then((data) => {
         if (!cancelled) setContent({ ...DEFAULT_CONTENT, ...data });

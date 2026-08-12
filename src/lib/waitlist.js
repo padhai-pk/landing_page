@@ -4,18 +4,35 @@
 import { SUBJECTS, BADGE_SEATS_PER_SUBJECT } from './subjects';
 import { getFromBackend, postToBackend } from './backend.js';
 
-const CACHE_BOOTSTRAP_KEY = 'padhai-cache-bootstrap-v2';
-const CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24h
+const CACHE_BOOTSTRAP_KEY = 'padhai-cache-bootstrap-v3';
+const CACHE_BOOTSTRAP_KEY_LEGACY = 'padhai-cache-bootstrap-v2';
+const CACHE_MAX_AGE_MS = 60 * 60 * 1000; // 1 hour
+
+function clearPersistedBootstrapCache() {
+  try {
+    localStorage.removeItem(CACHE_BOOTSTRAP_KEY);
+    localStorage.removeItem(CACHE_BOOTSTRAP_KEY_LEGACY);
+  } catch {
+    // ignore
+  }
+}
 
 function readBootstrapCache() {
   try {
     const raw = localStorage.getItem(CACHE_BOOTSTRAP_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== 'object') return null;
-    if (!parsed.savedAt || (Date.now() - parsed.savedAt) > CACHE_MAX_AGE_MS) return null;
+    if (!parsed || typeof parsed !== 'object') {
+      clearPersistedBootstrapCache();
+      return null;
+    }
+    if (!parsed.savedAt || (Date.now() - parsed.savedAt) > CACHE_MAX_AGE_MS) {
+      clearPersistedBootstrapCache();
+      return null;
+    }
     return parsed.value ?? null;
   } catch {
+    clearPersistedBootstrapCache();
     return null;
   }
 }
@@ -56,41 +73,38 @@ function mergeSubjects(bootstrapSubjects) {
 
 const DEFAULT_STATS = { studentsCount: 0, teachersNormalCount: 0, teachersBadgeCount: 0 };
 
-let bootstrapCache = null;
 let bootstrapPromise = null;
 
 async function fetchBootstrapFromNetwork() {
   return getFromBackend('/bootstrap');
 }
 
-function getBootstrap({ allowNetwork = true } = {}) {
-  if (bootstrapCache) {
-    return Promise.resolve(bootstrapCache);
-  }
-
-  const cached = readBootstrapCache();
-  if (cached) {
-    bootstrapCache = cached;
-    return Promise.resolve(cached);
-  }
-
-  if (!allowNetwork) {
-    return Promise.resolve({ subjects: [], stats: DEFAULT_STATS });
-  }
-
+/** Always revalidates from the network; uses local cache only as a fast fallback. */
+function fetchBootstrapFresh() {
   if (!bootstrapPromise) {
     bootstrapPromise = fetchBootstrapFromNetwork()
       .then((data) => {
-        bootstrapCache = data;
         writeBootstrapCache(data);
         return data;
       })
-      .catch((err) => {
+      .finally(() => {
         bootstrapPromise = null;
-        throw err;
       });
   }
   return bootstrapPromise;
+}
+
+function getBootstrap({ allowNetwork = true } = {}) {
+  if (!allowNetwork) {
+    const cached = readBootstrapCache();
+    return Promise.resolve(cached || { subjects: [], stats: DEFAULT_STATS });
+  }
+
+  return fetchBootstrapFresh().catch(() => {
+    const cached = readBootstrapCache();
+    if (cached) return cached;
+    return { subjects: [], stats: DEFAULT_STATS };
+  });
 }
 
 function applyBootstrap(boot, { subjectsCb, statsCb, stopped }) {
@@ -102,59 +116,58 @@ function applyBootstrap(boot, { subjectsCb, statsCb, stopped }) {
   }
 }
 
-export function listenToSubjects(callback) {
-  let stopped = false;
+function shouldUsePersistedCache() {
+  const nav = performance.getEntriesByType('navigation')[0];
+  // Hard/soft reload should always revalidate — don't paint stale localStorage first.
+  if (nav?.type === 'reload') return false;
+  return true;
+}
 
-  async function loadOnce() {
-    try {
-      const boot = await getBootstrap();
-      if (!stopped) callback(mergeSubjects(boot?.subjects));
-    } catch {
-      if (!stopped) callback(mergeSubjects([]));
-    }
+async function loadBootstrapData({ subjectsCb, statsCb, isStopped }) {
+  if (isStopped()) return;
+
+  const cached = shouldUsePersistedCache() ? readBootstrapCache() : null;
+  if (cached) {
+    applyBootstrap(cached, { subjectsCb, statsCb, stopped: isStopped() });
   }
 
-  loadOnce();
+  try {
+    const boot = await getBootstrap();
+    if (!isStopped()) applyBootstrap(boot, { subjectsCb, statsCb, stopped: false });
+  } catch {
+    if (!cached && !isStopped()) {
+      applyBootstrap(null, { subjectsCb, statsCb, stopped: false });
+    }
+  }
+}
+
+function subscribeBootstrap({ onSubjects, onStats } = {}) {
+  let stopped = false;
+  const isStopped = () => stopped;
+
+  loadBootstrapData({ subjectsCb: onSubjects, statsCb: onStats, isStopped });
+
+  const refreshTimer = window.setInterval(() => {
+    loadBootstrapData({ subjectsCb: onSubjects, statsCb: onStats, isStopped });
+  }, CACHE_MAX_AGE_MS);
+
   return () => {
     stopped = true;
+    window.clearInterval(refreshTimer);
   };
 }
 
+export function listenToSubjects(callback) {
+  return subscribeBootstrap({ onSubjects: callback });
+}
+
 export function listenToStats(callback) {
-  let stopped = false;
-
-  async function loadOnce() {
-    try {
-      const boot = await getBootstrap();
-      if (!stopped) callback(boot?.stats || DEFAULT_STATS);
-    } catch {
-      if (!stopped) callback(DEFAULT_STATS);
-    }
-  }
-
-  loadOnce();
-  return () => {
-    stopped = true;
-  };
+  return subscribeBootstrap({ onStats: callback });
 }
 
 /** One shared bootstrap load for pages that need both subjects and stats. */
 export function listenToBootstrap({ onSubjects, onStats } = {}) {
-  let stopped = false;
-
-  async function loadOnce() {
-    try {
-      const boot = await getBootstrap();
-      applyBootstrap(boot, { subjectsCb: onSubjects, statsCb: onStats, stopped });
-    } catch {
-      applyBootstrap(null, { subjectsCb: onSubjects, statsCb: onStats, stopped });
-    }
-  }
-
-  loadOnce();
-  return () => {
-    stopped = true;
-  };
+  return subscribeBootstrap({ onSubjects, onStats });
 }
 
 export async function joinStudentWaitlist(formData) {
