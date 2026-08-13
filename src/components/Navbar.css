@@ -99,11 +99,52 @@
 }
 .navbar__mobile a { font-weight: 600; color: var(--fg); padding: var(--sp-2) 0; }
 
+.navbar__mobile-social {
+  display: none;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+}
+.navbar__mobile-social-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-secondary);
+}
+.navbar__mobile-social-links {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.navbar__mobile-social-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--fg);
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.navbar__mobile-social-btn:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: rgba(18, 209, 111, 0.08);
+}
+
 @media (max-width: 860px) {
   .navbar__links { display: none; }
   .navbar__actions .navbar__cta { display: none !important; }
   .navbar__actions .navbar__burger {
     display: inline-flex !important;
+  }
+  .navbar__mobile-social {
+    display: flex;
   }
   /* Social links stay in the footer on mobile — keep the header for logo + controls only */
   .navbar__social { display: none !important; }

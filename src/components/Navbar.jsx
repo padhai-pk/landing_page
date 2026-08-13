@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Facebook, Instagram } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle.jsx';
-import { Facebook, Instagram } from 'lucide-react';
 import { useContent } from '../lib/content.jsx';
 import './Navbar.css';
 import { useTheme } from '../lib/theme.jsx';
@@ -62,6 +61,31 @@ const logoSrc = theme === 'dark' ? content.logo.srcDark : content.logo.srcLight;
           {links.map((l) => (
             <a key={l.href} href={`/${l.href}`} onClick={() => setOpen(false)}>{l.label}</a>
           ))}
+          <div className="navbar__mobile-social">
+            <span className="navbar__mobile-social-label">Follow us</span>
+            <div className="navbar__mobile-social-links">
+              <a
+                href={content.social.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="navbar__mobile-social-btn"
+                aria-label="Padhai.pk on Facebook"
+                onClick={() => setOpen(false)}
+              >
+                <Facebook size={18} />
+              </a>
+              <a
+                href={content.social.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="navbar__mobile-social-btn"
+                aria-label="Padhai.pk on Instagram"
+                onClick={() => setOpen(false)}
+              >
+                <Instagram size={18} />
+              </a>
+            </div>
+          </div>
           <a href="/#waitlist" className="btn btn-primary btn-md" onClick={() => setOpen(false)}>
             {content.nav.cta}
           </a>
