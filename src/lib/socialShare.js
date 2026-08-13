@@ -124,8 +124,16 @@ function downloadBlob(blob, filename = 'padhai-pk-card.png') {
   URL.revokeObjectURL(url);
 }
 
-function isMobile() {
+export function isMobile() {
   return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+function isIOS() {
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+function isAndroid() {
+  return /Android/i.test(navigator.userAgent);
 }
 
 function siteUrlFromConfig(config) {
@@ -134,6 +142,124 @@ function siteUrlFromConfig(config) {
 
 function msg(config, key, fallback) {
   return config?.shareMessages?.[key] || DEFAULT_SHARE_CAPTIONS.shareMessages[key] || fallback;
+}
+
+function navigateTo(url, popup) {
+  if (popup && !popup.closed) {
+    popup.location.replace(url);
+    return 'popup';
+  }
+  if (isMobile()) {
+    window.location.assign(url);
+    return 'same-window';
+  }
+  window.open(url, '_blank', 'noopener,noreferrer');
+  return 'new-window';
+}
+
+async function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result !== 'string') {
+        reject(new Error('Could not read image'));
+        return;
+      }
+      resolve(result.split(',')[1] || '');
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+/** Compress large PNG cards so Instagram story deep links stay within URL limits. */
+async function compressForStoryShare(blob) {
+  if (blob.size <= 900_000) return blob;
+  try {
+    const bitmap = await createImageBitmap(blob);
+    const maxWidth = 1080;
+    const scale = Math.min(1, maxWidth / bitmap.width);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    const jpeg = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.88));
+    return jpeg || blob;
+  } catch {
+    return blob;
+  }
+}
+
+function openLinkedInComposer(caption, popup) {
+  const url = `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(caption)}`;
+  navigateTo(url, popup);
+  return { method: 'linkedin', attachedImage: false };
+}
+
+function openFacebookComposer(caption, siteUrl, popup) {
+  const encodedCaption = encodeURIComponent(caption);
+  const encodedUrl = encodeURIComponent(siteUrl);
+
+  if (isIOS()) {
+    window.location.assign('fb://publish');
+    return { method: 'facebook-ios', attachedImage: false };
+  }
+
+  if (isAndroid()) {
+    window.location.assign(
+      `intent://composer/?text=${encodedCaption}#Intent;package=com.facebook.katana;scheme=fb;end`,
+    );
+    return { method: 'facebook-android', attachedImage: false };
+  }
+
+  const url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedCaption}`;
+  navigateTo(url, popup);
+  return { method: 'facebook-web', attachedImage: false };
+}
+
+async function openInstagramStory(blob, popup) {
+  const storyBlob = await compressForStoryShare(blob);
+
+  if (isIOS()) {
+    try {
+      const base64 = await blobToBase64(storyBlob);
+      window.location.assign(
+        `instagram-stories://share?backgroundImage=${encodeURIComponent(base64)}`,
+      );
+      return { method: 'instagram-story-ios', attachedImage: true };
+    } catch {
+      window.location.assign('instagram://story-camera');
+      return { method: 'instagram-story-ios-fallback', attachedImage: false };
+    }
+  }
+
+  if (isAndroid()) {
+    try {
+      const base64 = await blobToBase64(storyBlob);
+      window.location.assign(
+        `intent://share/#Intent;package=com.instagram.android;scheme=instagram-stories;type=image/*;S.background_image=${encodeURIComponent(base64)};end`,
+      );
+      return { method: 'instagram-story-android', attachedImage: true };
+    } catch {
+      window.location.assign(
+        'intent://story-camera/#Intent;package=com.instagram.android;scheme=instagram;end',
+      );
+      return { method: 'instagram-story-android-fallback', attachedImage: false };
+    }
+  }
+
+  navigateTo('https://www.instagram.com/', popup);
+  return { method: 'instagram-web', attachedImage: false };
+}
+
+function scheduleCaptionAndDownload(caption, blob, skipDownload) {
+  window.setTimeout(async () => {
+    await copyCaption(caption);
+    if (!skipDownload) downloadBlob(blob);
+  }, 600);
 }
 
 /** Try the OS share sheet with image + caption (best on mobile → IG/FB stories & posts). */
@@ -163,69 +289,81 @@ export async function tryNativeShare(blob, caption, config = DEFAULT_SHARE_CAPTI
 }
 
 /**
- * Open the native composer for each platform directly (no OS share sheet).
- * Downloads the card and copies the caption so the user can attach/paste in-app.
+ * Open each platform's post/story composer directly (no OS share sheet).
+ * Opens the composer first, then copies the caption and downloads the card if needed.
  */
-export async function openPlatformShare(platform, { blob, caption, social = {}, config = DEFAULT_SHARE_CAPTIONS }) {
+export async function openPlatformShare(platform, {
+  blob,
+  caption,
+  config = DEFAULT_SHARE_CAPTIONS,
+  popup = null,
+}) {
   const siteUrl = siteUrlFromConfig(config);
-  const encodedCaption = encodeURIComponent(caption);
-  const encodedUrl = encodeURIComponent(siteUrl);
-  const copied = await copyCaption(caption);
+  let openResult;
 
-  downloadBlob(blob);
+  try {
+    switch (platform) {
+      case 'linkedin':
+        openResult = openLinkedInComposer(caption, popup);
+        break;
+      case 'facebook':
+        openResult = openFacebookComposer(caption, siteUrl, popup);
+        break;
+      case 'instagram':
+        openResult = await openInstagramStory(blob, popup);
+        break;
+      default:
+        popup?.close();
+        return { copied: false, opened: false, method: 'none', message: 'Sharing is not available on this platform.' };
+    }
+  } catch {
+    popup?.close();
+    return { copied: false, opened: false, method: 'error', message: 'Could not open the app. Try Share now or download the card.' };
+  }
+
+  scheduleCaptionAndDownload(caption, blob, openResult.attachedImage);
 
   switch (platform) {
-    case 'linkedin': {
-      const url = `https://www.linkedin.com/feed/?shareActive=true&text=${encodedCaption}`;
-      window.open(url, '_blank', 'noopener,noreferrer');
+    case 'linkedin':
       return {
-        copied,
+        copied: true,
         opened: true,
-        method: 'linkedin',
-        message: copied
-          ? msg(config, 'linkedinCopied', 'Caption copied & LinkedIn post opened.')
-          : msg(config, 'linkedinOpened', 'LinkedIn post opened with your caption.'),
+        method: openResult.method,
+        message: msg(
+          config,
+          'linkedinCopied',
+          'LinkedIn post composer opened with your caption — attach the card if it is not already there.',
+        ),
       };
-    }
-
-    case 'facebook': {
-      if (isMobile()) {
-        window.location.href = 'fb://composer';
-      } else {
-        const url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedCaption}`;
-        window.open(url, '_blank', 'noopener,noreferrer,width=600,height=720');
-      }
+    case 'facebook':
       return {
-        copied,
+        copied: true,
         opened: true,
-        method: 'facebook',
-        message: copied
-          ? msg(config, 'facebookCopied', 'Caption copied & Facebook composer opened.')
-          : msg(config, 'facebookOpened', 'Facebook composer opened.'),
+        method: openResult.method,
+        message: msg(
+          config,
+          'facebookCopied',
+          'Facebook composer opened — attach the downloaded card, paste the caption if needed, tag Padhai.pk, then Post.',
+        ),
       };
-    }
-
-    case 'instagram': {
-      if (isMobile()) {
-        window.location.href = 'instagram-stories://share';
-        window.setTimeout(() => {
-          window.location.href = 'instagram://story-camera';
-        }, 400);
-      } else {
-        const igUrl = social.instagram || 'https://www.instagram.com/padhai.pk/';
-        window.open(igUrl, '_blank', 'noopener,noreferrer');
-      }
+    case 'instagram':
       return {
-        copied,
+        copied: true,
         opened: true,
-        method: 'instagram',
-        message: copied
-          ? msg(config, 'instagramCopied', 'Card saved & caption copied! Instagram Stories is opening — attach your card and paste the caption.')
-          : msg(config, 'instagramOpened', 'Card saved! Instagram Stories is opening — attach your card and tag @padhai.pk.'),
+        method: openResult.method,
+        message: openResult.attachedImage
+          ? msg(
+            config,
+            'instagramCopied',
+            'Instagram Stories opened with your card — add the caption and tag @padhai.pk, then share.',
+          )
+          : msg(
+            config,
+            'instagramOpened',
+            'Instagram Stories is opening — pick your downloaded card, paste the caption, and tag @padhai.pk.',
+          ),
       };
-    }
-
     default:
-      return { copied, opened: false, method: 'none', message: 'Sharing is not available on this platform.' };
+      return { copied: false, opened: false, method: 'none', message: 'Sharing is not available on this platform.' };
   }
 }

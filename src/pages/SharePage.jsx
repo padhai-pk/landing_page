@@ -4,7 +4,7 @@ import { Download, Facebook, Instagram, Linkedin, Share2, Gift, ShieldCheck, Par
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import { drawShareCard, renderShareCardBlob } from '../lib/shareCard.js';
-import { buildShareCaption, loadShareCaptions, openPlatformShare, tryNativeShare } from '../lib/socialShare.js';
+import { buildShareCaption, loadShareCaptions, openPlatformShare, tryNativeShare, isMobile } from '../lib/socialShare.js';
 import { useContent } from '../lib/content.jsx';
 import { getFromBackend } from '../lib/backend.js';
 import './SharePage.css';
@@ -53,9 +53,12 @@ export default function SharePage() {
       .then((data) => {
         if (!cancelled) setRemoteState(data);
       })
-      .catch(() => {
+      .catch((err) => {
         if (!cancelled) {
-          setLoadError('We could not load your share card. The link may be invalid or expired.');
+          setLoadError(
+            err?.message
+            || 'We could not load your share card. Please try again later.',
+          );
         }
       })
       .finally(() => {
@@ -192,6 +195,10 @@ export default function SharePage() {
   async function handlePlatformShare(platform) {
     setBusyPlatform(platform);
     setNote('');
+
+    // Keep a popup window tied to the click so desktop composers are not blocked.
+    const popup = !isMobile() ? window.open('about:blank', '_blank') : null;
+
     try {
       const config = captionsConfig || (await loadShareCaptions());
       const blob = await renderShareCardBlob(cardArgs);
@@ -206,8 +213,12 @@ export default function SharePage() {
         caption,
         social: content.social,
         config,
+        popup,
       });
       setNote(result.message);
+    } catch {
+      popup?.close();
+      setNote('Could not open the app. Try Share now or download the card.');
     } finally {
       setBusyPlatform('');
     }
