@@ -1,16 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Download, Facebook, Instagram, Linkedin, Share2, Gift, ShieldCheck, PartyPopper, Sun, Moon } from 'lucide-react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Download, Facebook, Instagram, Linkedin, Share2, Gift, ShieldCheck, PartyPopper, Sun, Moon, Loader2 } from 'lucide-react';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import { drawShareCard, renderShareCardBlob } from '../lib/shareCard.js';
 import { buildShareCaption, loadShareCaptions, openPlatformShare, tryNativeShare } from '../lib/socialShare.js';
 import { useContent } from '../lib/content.jsx';
+import { getFromBackend } from '../lib/backend.js';
 import './SharePage.css';
 
 export default function SharePage() {
-  const { state } = useLocation();
+  const { state: routeState } = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const content = useContent();
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -20,10 +22,48 @@ export default function SharePage() {
   const [avatarImg, setAvatarImg] = useState(null);
   const [cardTheme, setCardTheme] = useState('dark');
   const [captionsConfig, setCaptionsConfig] = useState(null);
+  const [remoteState, setRemoteState] = useState(null);
+  const [loadingCard, setLoadingCard] = useState(false);
+  const [loadError, setLoadError] = useState('');
+
+  const state = routeState || remoteState;
 
   useEffect(() => {
     loadShareCaptions().then(setCaptionsConfig);
   }, []);
+
+  useEffect(() => {
+    if (routeState) {
+      setRemoteState(null);
+      setLoadError('');
+      return;
+    }
+
+    const collection = searchParams.get('collection');
+    const id = searchParams.get('id');
+    const token = searchParams.get('token');
+    if (!collection || !id || !token) return;
+
+    let cancelled = false;
+    setLoadingCard(true);
+    setLoadError('');
+
+    const query = new URLSearchParams({ collection, id, token });
+    getFromBackend(`/share-card?${query.toString()}`)
+      .then((data) => {
+        if (!cancelled) setRemoteState(data);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLoadError('We could not load your share card. The link may be invalid or expired.');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingCard(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [routeState, searchParams]);
 
   const badgeSubjects = state?.badgeSubjects
     || (state?.subjectResults || []).filter((r) => r.status === 'seat_reserved').map((r) => r.subjectName);
@@ -54,14 +94,30 @@ export default function SharePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, avatarImg, cardTheme]);
 
+  if (loadingCard) {
+    return (
+      <>
+        <Navbar />
+        <main className="sharepage">
+          <div className="container sharepage__empty">
+            <Loader2 size={28} className="waitlist__spinner" aria-hidden />
+            <h1>Loading your card…</h1>
+            <p>Please wait a moment.</p>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
   if (!state) {
     return (
       <>
         <Navbar />
         <main className="sharepage">
           <div className="container sharepage__empty">
-            <h1>Nothing to show here yet</h1>
-            <p>Join the waitlist first to get your shareable card.</p>
+            <h1>{loadError ? 'Could not load your card' : 'Nothing to show here yet'}</h1>
+            <p>{loadError || 'Join the waitlist first to get your shareable card.'}</p>
             <Link to="/#waitlist" className="btn btn-primary btn-lg">Go to the waitlist</Link>
           </div>
         </main>
