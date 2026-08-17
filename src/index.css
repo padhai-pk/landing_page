@@ -175,7 +175,8 @@ img, svg { max-width: 100%; display: block; }
 .btn-sm { padding: 10px 20px; font-size: 0.875rem; }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--light-green), var(--green));
+  /* background: linear-gradient(135deg, var(--light-green), var(--green)); */
+  background-color: var(--light-green);
   color: #fff;
   box-shadow: 0 6px 16px rgba(18, 209, 111, 0.22);
 }

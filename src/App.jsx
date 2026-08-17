@@ -5,6 +5,7 @@ import { ContentProvider } from './lib/content.jsx';
 import LandingPage from './pages/LandingPage.jsx';
 import BadgeApplicationPage from './pages/BadgeApplicationPage.jsx';
 import SharePage from './pages/SharePage.jsx';
+import WhatsAppFloat from './components/WhatsAppFloat.jsx';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
             <Route path="/badge-application" element={<BadgeApplicationPage />} />
             <Route path="/share" element={<SharePage />} />
           </Routes>
+          <WhatsAppFloat />
         </BrowserRouter>
       </ContentProvider>
     </ThemeProvider>

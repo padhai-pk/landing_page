@@ -8,6 +8,7 @@ import FeaturesGrid from '../components/FeaturesGrid.jsx';
 import SeatProgram from '../components/SeatProgram.jsx';
 import WaitlistSection from '../components/WaitlistSection.jsx';
 import FAQSection from '../components/FAQSection.jsx';
+import ContactSection from '../components/ContactSection.jsx';
 import Footer from '../components/Footer.jsx';
 import Toast from '../components/Toast.jsx';
 import BackToTop from '../components/BackToTop.jsx';
@@ -49,6 +50,7 @@ export default function LandingPage() {
         <SeatProgram subjects={subjects} />
         <WaitlistSection subjects={subjects} onResult={showToast} activeTab={waitlistTab} onTabChange={setWaitlistTab} />
         <FAQSection />
+        <ContactSection />
       </main>
       <Footer />
       <Toast toast={toast} onClose={() => setToast(null)} />

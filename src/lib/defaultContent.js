@@ -49,6 +49,10 @@ export const DEFAULT_CONTENT = {
         "label": "FAQ"
       },
       {
+        "href": "#contact",
+        "label": "Contact"
+      },
+      {
         "href": "#waitlist",
         "label": "Waitlist"
       }
@@ -214,6 +218,16 @@ export const DEFAULT_CONTENT = {
   "footer": {
     "tagline": "Padhna ho ya Padhana, sirf Padhai.pk pr aana.",
     "copyright": "Padhai.pk. Pre-launch — open to students and teachers everywhere."
+  },
+  "contact": {
+    "eyebrow": "Contact us",
+    "heading": "Questions? We're here to help.",
+    "subtext": "Reach the Padhai.pk team by email or WhatsApp — whether you're a student, teacher, or partner.",
+    "email": "hello@padhai.pk",
+    "whatsappNumber": "923001234567",
+    "whatsappDisplay": "+92 300 1234567",
+    "whatsappPrefill": "Hi Padhai.pk — I have a question about ",
+    "floatLabel": "Contact Padhai"
   },
   "demoStats": {
     "studentsCount": 184,

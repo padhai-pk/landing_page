@@ -31,6 +31,7 @@
       { "href": "#features", "label": "Features" },
       { "href": "#badge-program", "label": "Teacher Seats" },
       { "href": "#faq", "label": "FAQ" },
+      { "href": "#contact", "label": "Contact" },
       { "href": "#waitlist", "label": "Waitlist" }
     ],
     "cta": "Join waitlist"
@@ -185,6 +186,16 @@
   "footer": {
     "tagline": "Padhna ho ya Padhana, sirf Padhai.pk pr aana.",
     "copyright": "Padhai.pk."
+  },
+  "contact": {
+    "eyebrow": "Contact us",
+    "heading": "Questions? We're here to help.",
+    "subtext": "Reach the Padhai.pk team by email or WhatsApp — whether you're a student, teacher, or partner.",
+    "email": "info@padhai.pk",
+    "whatsappNumber": "+923253498893",
+    "whatsappDisplay": "+92 325 3498893",
+    "whatsappPrefill": "Hi Padhai.pk — I have a question about ",
+    "floatLabel": "Contact Padhai"
   },
   "demoStats": {
     "studentsCount": 184,
