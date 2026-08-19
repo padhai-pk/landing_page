@@ -27,7 +27,6 @@ import { DEFAULT_SHARE_CAPTIONS } from '../lib/defaultShareCaptions.js';
 import { useContent } from '../lib/content.jsx';
 import { getFromBackend } from '../lib/backend.js';
 import { submitShareScreenshot } from '../lib/waitlist.js';
-import { validateDocFile } from '../lib/fileValidation.js';
 import './SharePage.css';
 
 const PLATFORMS = [
@@ -59,8 +58,15 @@ export default function SharePage() {
   const [loadError, setLoadError] = useState('');
   const [uploadingScreenshot, setUploadingScreenshot] = useState(false);
   const [screenshotUploaded, setScreenshotUploaded] = useState(false);
+  const [uploadNote, setUploadNote] = useState('');
+  const [uploadNoteKind, setUploadNoteKind] = useState('');
 
   const state = routeState || remoteState;
+  const shareCredentials = {
+    collection: state?.collection || searchParams.get('collection') || '',
+    id: state?.id || searchParams.get('id') || '',
+    shareToken: state?.shareToken || searchParams.get('token') || '',
+  };
   const sharePageCopy = captionsConfig?.sharePage || DEFAULT_SHARE_CAPTIONS.sharePage;
   const isTeacherRole = state?.role === 'teacher' || state?.role === 'badge';
 
@@ -264,32 +270,31 @@ export default function SharePage() {
     e.target.value = '';
     if (!file) return;
 
-    const check = validateDocFile(file);
-    if (!check.valid || !file.type.startsWith('image/')) {
-      setNote('Please upload a JPG or PNG screenshot of your post or story.');
-      return;
-    }
-
-    if (!state?.shareToken || !state?.collection || !state?.id) {
-      setNote('Could not verify your waitlist entry. Open your share card from the email link and try again.');
+    const { collection, id, shareToken } = shareCredentials;
+    if (!shareToken || !collection || !id) {
+      setUploadNoteKind('error');
+      setUploadNote('Could not verify your waitlist entry. Open your share card from the email link and try again.');
       return;
     }
 
     setUploadingScreenshot(true);
-    setNote('');
+    setUploadNote('');
+    setUploadNoteKind('');
 
     try {
-      await submitShareScreenshot({
-        collectionName: state.collection,
-        id: state.id,
-        shareToken: state.shareToken,
+      const result = await submitShareScreenshot({
+        collectionName: collection,
+        id,
+        shareToken,
         file,
       });
 
       setScreenshotUploaded(true);
-      setNote(sharePageCopy.uploadSuccess);
+      setUploadNoteKind('success');
+      setUploadNote(result?.message || sharePageCopy.uploadSuccess);
     } catch (err) {
-      setNote(err?.message || 'Could not upload your screenshot. Please try again.');
+      setUploadNoteKind('error');
+      setUploadNote(err?.message || 'Could not upload your screenshot. Please try again.');
     } finally {
       setUploadingScreenshot(false);
     }
@@ -447,8 +452,21 @@ export default function SharePage() {
               {uploadingScreenshot
                 ? <Loader2 size={16} className="waitlist__spinner" aria-hidden />
                 : <Upload size={16} />}
-              {uploadingScreenshot ? sharePageCopy.uploadingScreenshot : sharePageCopy.uploadScreenshot}
+              {uploadingScreenshot
+                ? sharePageCopy.uploadingScreenshot
+                : screenshotUploaded
+                  ? 'Screenshot uploaded'
+                  : sharePageCopy.uploadScreenshot}
             </button>
+            {uploadNote && (
+              <p
+                className={`sharepage__upload-note sharepage__upload-note--${uploadNoteKind || 'info'}`}
+                role="status"
+                aria-live="polite"
+              >
+                {uploadNote}
+              </p>
+            )}
           </section>
 
           <p className="sharepage__admin-note">

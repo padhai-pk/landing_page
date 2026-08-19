@@ -2,7 +2,7 @@
 // All reads/writes go through the backend (no browser Firebase access).
 
 import { SUBJECTS, BADGE_SEATS_PER_SUBJECT } from './subjects';
-import { getFromBackend, postToBackend } from './backend.js';
+import { getFromBackend, postToBackend, postFormToBackend } from './backend.js';
 
 const CACHE_BOOTSTRAP_KEY = 'padhai-cache-bootstrap-v3';
 const CACHE_BOOTSTRAP_KEY_LEGACY = 'padhai-cache-bootstrap-v2';
@@ -217,6 +217,24 @@ export async function markShared({ collectionName, id, shareToken, platform }) {
 }
 
 const MAX_SCREENSHOT_BYTES = 3 * 1024 * 1024;
+const SCREENSHOT_EXTENSIONS = ['.jpg', '.jpeg', '.png'];
+
+function validateScreenshotFile(file) {
+  if (!file) return { valid: false, reason: 'No file selected.' };
+  if (file.size > MAX_SCREENSHOT_BYTES) {
+    return { valid: false, reason: 'Screenshot is too large (max 3MB). Try a smaller image.' };
+  }
+
+  const name = (file.name || '').toLowerCase();
+  const hasAllowedExt = SCREENSHOT_EXTENSIONS.some((ext) => name.endsWith(ext));
+  const mime = (file.type || '').toLowerCase();
+  const hasAllowedMime = mime === 'image/jpeg' || mime === 'image/png';
+
+  if (!hasAllowedExt && !hasAllowedMime) {
+    return { valid: false, reason: 'Please upload a JPG or PNG screenshot.' };
+  }
+  return { valid: true };
+}
 
 export async function submitShareScreenshot({
   collectionName,
@@ -225,27 +243,17 @@ export async function submitShareScreenshot({
   file,
   platform = 'screenshot',
 }) {
-  if (!file) {
-    throw new Error('No file selected.');
-  }
-  if (file.size > MAX_SCREENSHOT_BYTES) {
-    throw new Error('Screenshot is too large (max 3MB). Try a smaller image and upload again.');
+  const check = validateScreenshotFile(file);
+  if (!check.valid) {
+    throw new Error(check.reason);
   }
 
-  const base64 = await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result).split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+  const formData = new FormData();
+  formData.append('collection', collectionName);
+  formData.append('id', id);
+  formData.append('shareToken', shareToken);
+  formData.append('platform', platform);
+  formData.append('file', file, file.name || 'screenshot.png');
 
-  return postToBackend('/share-screenshot', {
-    collection: collectionName,
-    id,
-    shareToken,
-    platform,
-    filename: file.name,
-    mimeType: file.type || 'application/octet-stream',
-    base64,
-  });
+  return postFormToBackend('/share-screenshot', formData);
 }

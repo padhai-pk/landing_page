@@ -35,6 +35,30 @@ export async function postToBackend(path, body) {
   return requestBackend('POST', path, body);
 }
 
+export async function postFormToBackend(path, formData) {
+  if (!BASE_URL) {
+    throw new Error(backendNotConfiguredMessage());
+  }
+
+  let res;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, {
+      method: 'POST',
+      cache: 'no-store',
+      body: formData,
+    });
+  } catch {
+    throw new Error(networkErrorMessage());
+  }
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(formatBackendError(res.status, data));
+  }
+  return data;
+}
+
 export async function getFromBackend(path) {
   return requestBackend('GET', path);
 }

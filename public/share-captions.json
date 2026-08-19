@@ -7,6 +7,7 @@
     "facebook": "@Padhai",
     "linkedin": "@Padhai"
   },
+  
   "blocks": {
     "tagline": "\n\nPadhna ho ya Padhana, sirf Padhai.pk pr aana!",
     "cta": "\n\n👉 Join the waitlist at {websiteLabel}\n{siteUrl}",

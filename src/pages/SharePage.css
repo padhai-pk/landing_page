@@ -335,6 +335,26 @@
   cursor: not-allowed;
 }
 
+.sharepage__upload-note {
+  margin-top: var(--sp-3);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.sharepage__upload-note--success {
+  color: var(--accent, #0B8058);
+  font-weight: 600;
+}
+
+.sharepage__upload-note--error {
+  color: #c0392b;
+}
+
+.sharepage__upload-note--info {
+  color: var(--fg-secondary);
+}
+
 .sharepage__btn-stack {
   width: 100%;
   max-width: 520px;
