@@ -215,3 +215,37 @@ export async function joinTeacherBadgeWaitlist(formData) {
 export async function markShared({ collectionName, id, shareToken, platform }) {
   return postToBackend('/mark-shared', { collection: collectionName, id, shareToken, platform });
 }
+
+const MAX_SCREENSHOT_BYTES = 3 * 1024 * 1024;
+
+export async function submitShareScreenshot({
+  collectionName,
+  id,
+  shareToken,
+  file,
+  platform = 'screenshot',
+}) {
+  if (!file) {
+    throw new Error('No file selected.');
+  }
+  if (file.size > MAX_SCREENSHOT_BYTES) {
+    throw new Error('Screenshot is too large (max 3MB). Try a smaller image and upload again.');
+  }
+
+  const base64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result).split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  return postToBackend('/share-screenshot', {
+    collection: collectionName,
+    id,
+    shareToken,
+    platform,
+    filename: file.name,
+    mimeType: file.type || 'application/octet-stream',
+    base64,
+  });
+}

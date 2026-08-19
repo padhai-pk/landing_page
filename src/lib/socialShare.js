@@ -46,6 +46,7 @@ function deepMergeCaptions(base, patch) {
     blocks: { ...base.blocks, ...patch.blocks },
     templates: { ...base.templates, ...patch.templates },
     shareMessages: { ...base.shareMessages, ...patch.shareMessages },
+    sharePage: { ...base.sharePage, ...patch.sharePage },
     websiteLabel: patch.websiteLabel ?? base.websiteLabel,
   };
 }

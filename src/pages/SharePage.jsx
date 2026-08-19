@@ -1,13 +1,44 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { Download, Facebook, Instagram, Linkedin, Share2, Gift, ShieldCheck, PartyPopper, Sun, Moon, Loader2 } from 'lucide-react';
+import {
+  Download,
+  Share2,
+  Gift,
+  ShieldCheck,
+  PartyPopper,
+  Sun,
+  Moon,
+  Loader2,
+  Upload,
+  Sparkles,
+  Lock,
+} from 'lucide-react';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import { drawShareCard, renderShareCardBlob } from '../lib/shareCard.js';
-import { buildShareCaption, loadShareCaptions, openPlatformShare, tryNativeShare, isMobile } from '../lib/socialShare.js';
+import {
+  buildShareCaption,
+  loadShareCaptions,
+  openPlatformShare,
+  tryNativeShare,
+  isMobile,
+} from '../lib/socialShare.js';
+import { DEFAULT_SHARE_CAPTIONS } from '../lib/defaultShareCaptions.js';
 import { useContent } from '../lib/content.jsx';
 import { getFromBackend } from '../lib/backend.js';
+import { submitShareScreenshot } from '../lib/waitlist.js';
+import { validateDocFile } from '../lib/fileValidation.js';
 import './SharePage.css';
+
+const PLATFORMS = [
+  { id: 'facebook', prefix: 'Post on', name: 'Facebook' },
+  { id: 'instagram', prefix: 'Share story on', name: 'Instagram' },
+  { id: 'linkedin', prefix: 'Post on', name: 'LinkedIn' },
+];
+
+function scrollToTop() {
+  window.scrollTo(0, 0);
+}
 
 export default function SharePage() {
   const { state: routeState } = useLocation();
@@ -16,6 +47,7 @@ export default function SharePage() {
   const content = useContent();
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
+  const screenshotInputRef = useRef(null);
   const avatarBoxRef = useRef(null);
   const [busyPlatform, setBusyPlatform] = useState('');
   const [note, setNote] = useState('');
@@ -25,12 +57,24 @@ export default function SharePage() {
   const [remoteState, setRemoteState] = useState(null);
   const [loadingCard, setLoadingCard] = useState(false);
   const [loadError, setLoadError] = useState('');
+  const [uploadingScreenshot, setUploadingScreenshot] = useState(false);
+  const [screenshotUploaded, setScreenshotUploaded] = useState(false);
 
   const state = routeState || remoteState;
+  const sharePageCopy = captionsConfig?.sharePage || DEFAULT_SHARE_CAPTIONS.sharePage;
+  const isTeacherRole = state?.role === 'teacher' || state?.role === 'badge';
+
+  useEffect(() => {
+    scrollToTop();
+  }, []);
 
   useEffect(() => {
     loadShareCaptions().then(setCaptionsConfig);
   }, []);
+
+  useEffect(() => {
+    if (state) scrollToTop();
+  }, [state]);
 
   useEffect(() => {
     if (routeState) {
@@ -96,6 +140,15 @@ export default function SharePage() {
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, avatarImg, cardTheme]);
+
+  async function buildCaption(config) {
+    return buildShareCaption({
+      role: state.role,
+      name: state.name,
+      subjects: state.subjects || badgeSubjects,
+      waitlistId: state.id,
+    }, config);
+  }
 
   if (loadingCard) {
     return (
@@ -172,42 +225,24 @@ export default function SharePage() {
     setNote('Card downloaded to your device.');
   }
 
-  async function handleNativeShare() {
-    setNote('');
-    const config = captionsConfig || (await loadShareCaptions());
-    const blob = await renderShareCardBlob(cardArgs);
-    const caption = buildShareCaption({
-      role: state.role,
-      name: state.name,
-      subjects: state.subjects || badgeSubjects,
-      waitlistId: state.id,
-    }, config);
-
-    const shared = await tryNativeShare(blob, caption, config);
-    if (shared) {
-      setNote(config.shareMessages?.nativeSuccess || 'Share sheet opened with your card and caption.');
-      return;
-    }
-
-    setNote(config.shareMessages?.nativeUnsupported || 'Native sharing isn\'t supported on this browser — use a platform button below.');
-  }
-
   async function handlePlatformShare(platform) {
     setBusyPlatform(platform);
     setNote('');
 
-    // Keep a popup window tied to the click so desktop composers are not blocked.
     const popup = !isMobile() ? window.open('about:blank', '_blank') : null;
 
     try {
       const config = captionsConfig || (await loadShareCaptions());
       const blob = await renderShareCardBlob(cardArgs);
-      const caption = buildShareCaption({
-        role: state.role,
-        name: state.name,
-        subjects: state.subjects || badgeSubjects,
-        waitlistId: state.id,
-      }, config);
+      const caption = await buildCaption(config);
+
+      const sharedNative = await tryNativeShare(blob, caption, config);
+      if (sharedNative) {
+        popup?.close();
+        setNote(config.shareMessages?.nativeSuccess || 'Share sheet opened with your card and caption.');
+        return;
+      }
+
       const result = await openPlatformShare(platform, {
         blob,
         caption,
@@ -218,10 +253,56 @@ export default function SharePage() {
       setNote(result.message);
     } catch {
       popup?.close();
-      setNote('Could not open the app. Try Share now or download the card.');
+      setNote('Could not open the app. Try downloading the card and sharing manually.');
     } finally {
       setBusyPlatform('');
     }
+  }
+
+  async function handleScreenshotUpload(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    const check = validateDocFile(file);
+    if (!check.valid || !file.type.startsWith('image/')) {
+      setNote('Please upload a JPG or PNG screenshot of your post or story.');
+      return;
+    }
+
+    if (!state?.shareToken || !state?.collection || !state?.id) {
+      setNote('Could not verify your waitlist entry. Open your share card from the email link and try again.');
+      return;
+    }
+
+    setUploadingScreenshot(true);
+    setNote('');
+
+    try {
+      await submitShareScreenshot({
+        collectionName: state.collection,
+        id: state.id,
+        shareToken: state.shareToken,
+        file,
+      });
+
+      setScreenshotUploaded(true);
+      setNote(sharePageCopy.uploadSuccess);
+    } catch (err) {
+      setNote(err?.message || 'Could not upload your screenshot. Please try again.');
+    } finally {
+      setUploadingScreenshot(false);
+    }
+  }
+
+  function platformPrefix(platformId) {
+    const fromCopy = sharePageCopy.platforms?.[platformId]
+      || DEFAULT_SHARE_CAPTIONS.sharePage.platforms[platformId];
+    const match = PLATFORMS.find((p) => p.id === platformId);
+    if (!fromCopy || !match) return { prefix: match?.prefix || '', name: match?.name || platformId };
+    const name = match.name;
+    const prefix = fromCopy.replace(name, '').trim();
+    return { prefix: prefix || match.prefix, name };
   }
 
   return (
@@ -296,48 +377,82 @@ export default function SharePage() {
         </div>
 
         <div className="container sharepage__inner">
+          <section className="sharepage__boost" aria-labelledby="share-boost-title">
+            <div className="sharepage__boost-head">
+              <Sparkles size={18} aria-hidden />
+              <h2 id="share-boost-title">{sharePageCopy.boostTitle}</h2>
+            </div>
+            <p className="sharepage__boost-intro">
+              {isTeacherRole ? sharePageCopy.teacherBoostIntro : sharePageCopy.studentBoostIntro}
+            </p>
+            <ul className="sharepage__boost-list">
+              {(isTeacherRole ? sharePageCopy.teacherBoostPoints : sharePageCopy.studentBoostPoints).map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
+          </section>
+
           {note && <p className="sharepage__note">{note}</p>}
 
-          <div className="sharepage__btn-stack">
-            <div className="sharepage__actions sharepage__actions--platforms">
-              <button
-                type="button"
-                className="sharepage__platform-btn"
-                disabled={busyPlatform === 'facebook'}
-                onClick={() => handlePlatformShare('facebook')}
-              >
-                <Facebook size={16} /> Facebook
-              </button>
-              <button
-                type="button"
-                className="sharepage__platform-btn"
-                disabled={busyPlatform === 'instagram'}
-                onClick={() => handlePlatformShare('instagram')}
-              >
-                <Instagram size={16} /> Instagram
-              </button>
-              <button
-                type="button"
-                className="sharepage__platform-btn"
-                disabled={busyPlatform === 'linkedin'}
-                onClick={() => handlePlatformShare('linkedin')}
-              >
-                <Linkedin size={16} /> LinkedIn
-              </button>
-            </div>
-
-            <div className="sharepage__actions sharepage__actions--utility">
-              <button type="button" className="sharepage__utility-btn" onClick={handleDownload}>
-                <Download size={16} /> Download
-              </button>
-              <button type="button" className="sharepage__utility-btn" onClick={handleNativeShare}>
-                <Share2 size={16} /> Share now
-              </button>
-            </div>
+          <div className="sharepage__platform-list">
+            {PLATFORMS.map(({ id }) => {
+              const { prefix, name } = platformPrefix(id);
+              return (
+                <div key={id} className="sharepage__platform-row">
+                  <p className="sharepage__platform-text">
+                    {prefix}{' '}
+                    <mark className="sharepage__platform-highlight">{name}</mark>
+                  </p>
+                  <button
+                    type="button"
+                    className="sharepage__share-btn"
+                    disabled={busyPlatform === id}
+                    onClick={() => handlePlatformShare(id)}
+                  >
+                    {busyPlatform === id
+                      ? <Loader2 size={16} className="waitlist__spinner" aria-hidden />
+                      : <Share2 size={16} />}
+                    {sharePageCopy.shareButton}
+                  </button>
+                </div>
+              );
+            })}
           </div>
 
+          <div className="sharepage__actions sharepage__actions--utility">
+            <button type="button" className="sharepage__utility-btn" onClick={handleDownload}>
+              <Download size={16} /> Download card
+            </button>
+          </div>
+
+          <section className="sharepage__private" aria-labelledby="share-private-title">
+            <div className="sharepage__private-head">
+              <Lock size={16} aria-hidden />
+              <h3 id="share-private-title">{sharePageCopy.privateProfileTitle}</h3>
+            </div>
+            <p>{sharePageCopy.privateProfileBody}</p>
+            <input
+              ref={screenshotInputRef}
+              type="file"
+              accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+              hidden
+              onChange={handleScreenshotUpload}
+            />
+            <button
+              type="button"
+              className="sharepage__upload-btn"
+              disabled={uploadingScreenshot || screenshotUploaded}
+              onClick={() => screenshotInputRef.current?.click()}
+            >
+              {uploadingScreenshot
+                ? <Loader2 size={16} className="waitlist__spinner" aria-hidden />
+                : <Upload size={16} />}
+              {uploadingScreenshot ? sharePageCopy.uploadingScreenshot : sharePageCopy.uploadScreenshot}
+            </button>
+          </section>
+
           <p className="sharepage__admin-note">
-            <ShieldCheck size={14} /> Profile Boosts are not applied automatically — admins verify your public post and waitlist ID before enabling your boost.
+            <ShieldCheck size={14} /> Profile Boosts are not applied automatically — admins verify your public post (or screenshot) and waitlist ID before enabling your boost.
           </p>
 
           <button type="button" className="sharepage__skip" onClick={() => navigate('/')}>

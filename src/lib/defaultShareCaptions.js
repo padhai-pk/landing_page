@@ -33,6 +33,30 @@ export const DEFAULT_SHARE_CAPTIONS = {
       body: "\n\nBe among the first on Pakistan's new learning platform.",
     },
   },
+  sharePage: {
+    boostTitle: "What's included in your free Profile Boost?",
+    teacherBoostIntro: 'Teachers with an active boost get seen first when students search:',
+    teacherBoostPoints: [
+      'Your profile appears at the top of search results — above non-boosted teachers.',
+      'More visibility means more proposals and demo requests from students who need your subject.',
+    ],
+    studentBoostIntro: 'Students with an active boost get more responses on their posts:',
+    studentBoostPoints: [
+      'You receive Post Boost credits so your learning requirement posts appear above other posts.',
+      'More teachers see your request first, so you get faster proposals on the subjects you need.',
+    ],
+    privateProfileTitle: 'Have a private profile?',
+    privateProfileBody: 'If your Instagram or Facebook account is private, you can still share your card as a post or story (visible to your followers), mention @padhai.pk, then upload a screenshot of your post below. Our team will verify it and apply your free 1-month boost.',
+    uploadScreenshot: 'Upload screenshot',
+    uploadingScreenshot: 'Uploading…',
+    uploadSuccess: 'Screenshot received! Our team will verify your post and apply your free Profile Boost.',
+    platforms: {
+      facebook: 'Post on Facebook',
+      instagram: 'Share story on Instagram',
+      linkedin: 'Post on LinkedIn',
+    },
+    shareButton: 'Share',
+  },
   shareMessages: {
     nativeSuccess: 'Share sheet opened with your card and caption — pick an app and tap Post.',
     nativeUnsupported: "Native sharing isn't supported on this browser — use Facebook, Instagram, or LinkedIn below.",
