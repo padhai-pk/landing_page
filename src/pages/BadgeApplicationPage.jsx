@@ -4,6 +4,7 @@ import { ArrowLeft, Award, UploadCloud, Loader2, FileText, MapPin } from 'lucide
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import CountryCitySelect from '../components/CountryCitySelect.jsx';
+import UniversitySelect from '../components/UniversitySelect.jsx';
 import PhoneInput from '../components/PhoneInput.jsx';
 import SubjectPicker from '../components/SubjectPicker.jsx';
 import { useContent } from '../lib/content.jsx';
@@ -259,11 +260,17 @@ export default function BadgeApplicationPage() {
                 <CountryCitySelect
                   country={form.country}
                   city={form.city}
-                  onCountryChange={(v) => update('country', v)}
+                  onCountryChange={(v) => { update('country', v); update('institution', ''); }}
                   onCityChange={(v) => update('city', v)}
                   fixedCountry="Pakistan"
                 />
               </div>
+              <UniversitySelect
+                country={form.country}
+                value={form.institution}
+                onChange={(v) => update('institution', v)}
+                label="University / college (optional)"
+              />
               <div className="badgepage__row">
                 <div className="badgepage__full">
                   <span className="badgepage__subjects-label">
@@ -283,7 +290,6 @@ export default function BadgeApplicationPage() {
               <h3>Qualifications</h3>
               <div className="badgepage__row">
                 <label>Highest qualification<input value={form.qualification} onChange={(e) => update('qualification', e.target.value)} placeholder="Highest Qualification" required /></label>
-                <label>Institution<input value={form.institution} onChange={(e) => update('institution', e.target.value)} placeholder="Institution" /></label>
               </div>
               <div className="badgepage__row">
               <label>

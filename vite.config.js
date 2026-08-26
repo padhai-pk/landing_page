@@ -7,6 +7,49 @@ function instagramProfileApiPlugin() {
     name: 'instagram-profile-api',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
+        if (!req.url?.startsWith('/api/universities')) return next();
+
+        if (req.method !== 'GET') {
+          res.statusCode = 405;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ error: 'Method not allowed.' }));
+          return;
+        }
+
+        const url = new URL(req.url, 'http://localhost');
+        const country = url.searchParams.get('country')?.trim();
+        if (!country) {
+          res.statusCode = 400;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ error: 'country query parameter is required.' }));
+          return;
+        }
+
+        try {
+          const params = new URLSearchParams({ country });
+          const upstream = await fetch(`http://universities.hipolabs.com/search?${params.toString()}`, {
+            headers: { Accept: 'application/json' },
+          });
+          if (!upstream.ok) {
+            res.statusCode = upstream.status;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'University lookup failed.' }));
+            return;
+          }
+          const data = await upstream.json();
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+          res.end(JSON.stringify(Array.isArray(data) ? data : []));
+        } catch (err) {
+          console.error('universities lookup failed:', err.message);
+          res.statusCode = 502;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({ error: 'Could not reach the university directory.' }));
+        }
+      });
+
+      server.middlewares.use(async (req, res, next) => {
         if (!req.url?.startsWith('/api/instagram-profile')) return next();
 
         if (req.method !== 'GET') {

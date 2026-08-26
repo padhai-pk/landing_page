@@ -46,8 +46,24 @@
       "More teachers see your request first, so you get faster proposals on the subjects you need."
     ],
     "privateProfileTitle": "Have a private profile?",
-    "privateProfileBody": "If your Instagram or Facebook account is private, you can still share your card as a post or story (visible to your followers), mention @padhai.pk, then upload a screenshot of your post below. Our team will verify it and apply your free 1-month boost.",
-    "uploadScreenshot": "Upload screenshot",
+    "privateProfileBody": "If your Instagram or Facebook account is private, you can still share your card as a post or story (visible to your followers), mention @padhai.pk, then upload a screenshot below. Our team will verify it and apply your free 1-month boost.",
+    "privateProfileRulesTitle": "Screenshot rules — please read before uploading",
+    "privateProfileRules": [
+      "Don't share from demo or brand-new accounts with only 5–10 followers.",
+      "Don't share only to Close Friends or a restricted story list our team can't verify.",
+      "Upload your screenshot at least 6 hours after posting — not immediately.",
+      "Don't delete the post after taking the screenshot; it must still be live when we review.",
+      "Don't crop out @padhai.pk, your waitlist ID, or the post timestamp from the screenshot.",
+      "Don't submit fake, edited, or reused screenshots — one boost per waitlist entry.",
+      "Make sure the username you enter below exactly matches the account that posted."
+    ],
+    "socialUsernameLabel": "Username of the account that posted",
+    "socialUsernamePlaceholder": "e.g. @yourusername",
+    "socialUsernameRequired": "Enter the username of the account where you posted before uploading.",
+    "screenshotFileLabel": "Screenshot of your post or story",
+    "screenshotFileHint": "JPG or PNG, max 3MB. Take it at least 6 hours after posting.",
+    "screenshotFileRequired": "Choose a screenshot of your post before submitting.",
+    "uploadScreenshot": "Submit screenshot for review",
     "uploadingScreenshot": "Uploading…",
     "uploadSuccess": "Screenshot received! Our team will verify your post and apply your free Profile Boost.",
     "platforms": {
@@ -55,6 +71,7 @@
       "instagram": "Share story on Instagram",
       "linkedin": "Post on LinkedIn"
     },
+    "whatsappCommunityIntro": "While you wait for launch, join our WhatsApp community for updates, tips, and early announcements.",
     "shareButton": "Share"
   },
   "shareMessages": {

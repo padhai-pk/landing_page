@@ -5,6 +5,7 @@ import Reveal from './Reveal.jsx';
 import SubjectPicker from './SubjectPicker.jsx';
 import CountryCitySelect from './CountryCitySelect.jsx';
 import PhoneInput from './PhoneInput.jsx';
+import UniversitySelect from './UniversitySelect.jsx';
 import { useContent } from '../lib/content.jsx';
 import './WaitlistSection.css';
 import { SUBJECTS, CATEGORIES } from '../lib/subjects.js';
@@ -18,7 +19,7 @@ const TABS = [
   { id: 'teacher', label: 'Join as teacher', icon: <GraduationCap size={16} /> },
 ];
 
-const emptyForm = { name: '', email: '', phone: '', country: '', city: '', experience: '' };
+const emptyForm = { name: '', email: '', phone: '', country: '', city: '', university: '', experience: '' };
 export default function WaitlistSection({ subjects, onResult, activeTab, onTabChange }) {
   const content = useContent();
   const navigate = useNavigate();
@@ -180,10 +181,16 @@ export default function WaitlistSection({ subjects, onResult, activeTab, onTabCh
                 <CountryCitySelect
                   country={form.country}
                   city={form.city}
-                  onCountryChange={(v) => update('country', v)}
+                  onCountryChange={(v) => { update('country', v); update('university', ''); }}
                   onCityChange={(v) => update('city', v)}
                 />
               </div>
+
+              <UniversitySelect
+                country={form.country}
+                value={form.university}
+                onChange={(v) => update('university', v)}
+              />
 
               <div className="waitlist__full">
                 <span className="waitlist__label-text">

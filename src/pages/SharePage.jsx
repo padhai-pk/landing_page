@@ -27,6 +27,7 @@ import { DEFAULT_SHARE_CAPTIONS } from '../lib/defaultShareCaptions.js';
 import { useContent } from '../lib/content.jsx';
 import { getFromBackend } from '../lib/backend.js';
 import { submitShareScreenshot } from '../lib/waitlist.js';
+import WhatsAppIcon from '../components/WhatsAppIcon.jsx';
 import './SharePage.css';
 
 const PLATFORMS = [
@@ -46,7 +47,6 @@ export default function SharePage() {
   const content = useContent();
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
-  const screenshotInputRef = useRef(null);
   const avatarBoxRef = useRef(null);
   const [busyPlatform, setBusyPlatform] = useState('');
   const [note, setNote] = useState('');
@@ -60,6 +60,8 @@ export default function SharePage() {
   const [screenshotUploaded, setScreenshotUploaded] = useState(false);
   const [uploadNote, setUploadNote] = useState('');
   const [uploadNoteKind, setUploadNoteKind] = useState('');
+  const [socialUsername, setSocialUsername] = useState('');
+  const [screenshotFile, setScreenshotFile] = useState(null);
 
   const state = routeState || remoteState;
   const shareCredentials = {
@@ -69,6 +71,12 @@ export default function SharePage() {
   };
   const sharePageCopy = captionsConfig?.sharePage || DEFAULT_SHARE_CAPTIONS.sharePage;
   const isTeacherRole = state?.role === 'teacher' || state?.role === 'badge';
+  const whatsappGroupUrl = isTeacherRole
+    ? content.whatsappGroups?.teacher
+    : content.whatsappGroups?.student;
+  const whatsappGroupLabel = isTeacherRole
+    ? (content.whatsappGroups?.teacherLabel || 'Join teacher WhatsApp community')
+    : (content.whatsappGroups?.studentLabel || 'Join student WhatsApp community');
 
   useEffect(() => {
     scrollToTop();
@@ -265,15 +273,25 @@ export default function SharePage() {
     }
   }
 
-  async function handleScreenshotUpload(e) {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
+  async function handleScreenshotSubmit(e) {
+    e.preventDefault();
 
     const { collection, id, shareToken } = shareCredentials;
     if (!shareToken || !collection || !id) {
       setUploadNoteKind('error');
       setUploadNote('Could not verify your waitlist entry. Open your share card from the email link and try again.');
+      return;
+    }
+
+    if (!socialUsername.trim()) {
+      setUploadNoteKind('error');
+      setUploadNote(sharePageCopy.socialUsernameRequired);
+      return;
+    }
+
+    if (!screenshotFile) {
+      setUploadNoteKind('error');
+      setUploadNote(sharePageCopy.screenshotFileRequired);
       return;
     }
 
@@ -286,7 +304,8 @@ export default function SharePage() {
         collectionName: collection,
         id,
         shareToken,
-        file,
+        file: screenshotFile,
+        socialUsername: socialUsername.trim(),
       });
 
       setScreenshotUploaded(true);
@@ -298,6 +317,15 @@ export default function SharePage() {
     } finally {
       setUploadingScreenshot(false);
     }
+  }
+
+  function handleScreenshotFilePick(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setScreenshotFile(file);
+    setUploadNote('');
+    setUploadNoteKind('');
   }
 
   function platformPrefix(platformId) {
@@ -314,7 +342,7 @@ export default function SharePage() {
     <>
       <Navbar />
       <main className="sharepage">
-        <div className="container sharepage__inner">
+        <div className="container sharepage__shell">
           <div className="sharepage__head">
             <h1><PartyPopper size={22} className="sharepage__head-icon" /> You're on the list!</h1>
             <p>Share your card and mention @padhai.pk — our team will manually verify your post and apply the free 1-month Profile Boost.</p>
@@ -330,152 +358,211 @@ export default function SharePage() {
               )}
             </div>
           )}
-        </div>
 
-        <div className="sharepage__card-stage">
-          <div className="sharepage__card-wrap">
-            <div className="sharepage__card-theme" aria-label="Card color theme">
-              <span className="sharepage__card-theme-label">Card theme</span>
-              <div className="sharepage__theme-toggle" role="group" aria-label="Card color theme">
-                <button
-                  type="button"
-                  className={`sharepage__theme-btn ${cardTheme === 'dark' ? 'is-active' : ''}`}
-                  onClick={() => setCardTheme('dark')}
-                  aria-pressed={cardTheme === 'dark'}
-                >
-                  <Moon size={14} /> Dark
-                </button>
-                <button
-                  type="button"
-                  className={`sharepage__theme-btn ${cardTheme === 'light' ? 'is-active' : ''}`}
-                  onClick={() => setCardTheme('light')}
-                  aria-pressed={cardTheme === 'light'}
-                >
-                  <Sun size={14} /> Light
+          <div className="sharepage__grid">
+            <div className="sharepage__col-card">
+              <div className="sharepage__card-stage">
+                <div className="sharepage__card-wrap">
+                  <div className="sharepage__card-theme" aria-label="Card color theme">
+                    <span className="sharepage__card-theme-label">Card theme</span>
+                    <div className="sharepage__theme-toggle" role="group" aria-label="Card color theme">
+                      <button
+                        type="button"
+                        className={`sharepage__theme-btn ${cardTheme === 'dark' ? 'is-active' : ''}`}
+                        onClick={() => setCardTheme('dark')}
+                        aria-pressed={cardTheme === 'dark'}
+                      >
+                        <Moon size={14} /> Dark
+                      </button>
+                      <button
+                        type="button"
+                        className={`sharepage__theme-btn ${cardTheme === 'light' ? 'is-active' : ''}`}
+                        onClick={() => setCardTheme('light')}
+                        aria-pressed={cardTheme === 'light'}
+                      >
+                        <Sun size={14} /> Light
+                      </button>
+                    </div>
+                  </div>
+                  <canvas
+                    ref={canvasRef}
+                    className="sharepage__canvas"
+                    onClick={handleCanvasClick}
+                    role="button"
+                    aria-label="Tap your photo to upload"
+                  />
+                </div>
+
+                <p className="sharepage__promo-highlight">
+                  <Gift size={16} />
+                  <span>
+                    <strong>Share &amp; get 1 Month FREE Profile Boost</strong>
+                    <em>Mention @padhai.pk on Facebook, Instagram or LinkedIn</em>
+                  </span>
+                </p>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={handleAvatarPick}
+                />
+              </div>
+
+              <div className="sharepage__actions sharepage__actions--utility sharepage__actions--card">
+                <button type="button" className="sharepage__utility-btn" onClick={handleDownload}>
+                  <Download size={16} /> Download card
                 </button>
               </div>
             </div>
-            <canvas
-              ref={canvasRef}
-              className="sharepage__canvas"
-              onClick={handleCanvasClick}
-              role="button"
-              aria-label="Tap your photo to upload"
-            />
-          </div>
 
-          <p className="sharepage__promo-highlight">
-            <Gift size={16} />
-            <span>
-              <strong>Share &amp; get 1 Month FREE Profile Boost</strong>
-              <em>Mention @padhai.pk on Facebook, Instagram or LinkedIn</em>
-            </span>
-          </p>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            hidden
-            onChange={handleAvatarPick}
-          />
-        </div>
-
-        <div className="container sharepage__inner">
-          <section className="sharepage__boost" aria-labelledby="share-boost-title">
-            <div className="sharepage__boost-head">
-              <Sparkles size={18} aria-hidden />
-              <h2 id="share-boost-title">{sharePageCopy.boostTitle}</h2>
-            </div>
-            <p className="sharepage__boost-intro">
-              {isTeacherRole ? sharePageCopy.teacherBoostIntro : sharePageCopy.studentBoostIntro}
-            </p>
-            <ul className="sharepage__boost-list">
-              {(isTeacherRole ? sharePageCopy.teacherBoostPoints : sharePageCopy.studentBoostPoints).map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
-          </section>
-
-          {note && <p className="sharepage__note">{note}</p>}
-
-          <div className="sharepage__platform-list">
-            {PLATFORMS.map(({ id }) => {
-              const { prefix, name } = platformPrefix(id);
-              return (
-                <div key={id} className="sharepage__platform-row">
-                  <p className="sharepage__platform-text">
-                    {prefix}{' '}
-                    <mark className="sharepage__platform-highlight">{name}</mark>
-                  </p>
-                  <button
-                    type="button"
-                    className="sharepage__share-btn"
-                    disabled={busyPlatform === id}
-                    onClick={() => handlePlatformShare(id)}
+            <div className="sharepage__col-actions">
+              {whatsappGroupUrl && (
+                <div className="sharepage__community">
+                  <p>{sharePageCopy.whatsappCommunityIntro}</p>
+                  <a
+                    href={whatsappGroupUrl}
+                    className="sharepage__community-btn"
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    {busyPlatform === id
-                      ? <Loader2 size={16} className="waitlist__spinner" aria-hidden />
-                      : <Share2 size={16} />}
-                    {sharePageCopy.shareButton}
-                  </button>
+                    <WhatsAppIcon size={18} />
+                    {whatsappGroupLabel}
+                  </a>
                 </div>
-              );
-            })}
-          </div>
+              )}
 
-          <div className="sharepage__actions sharepage__actions--utility">
-            <button type="button" className="sharepage__utility-btn" onClick={handleDownload}>
-              <Download size={16} /> Download card
-            </button>
+              <section className="sharepage__boost" aria-labelledby="share-boost-title">
+                <div className="sharepage__boost-head">
+                  <Sparkles size={18} aria-hidden />
+                  <h2 id="share-boost-title">{sharePageCopy.boostTitle}</h2>
+                </div>
+                <p className="sharepage__boost-intro">
+                  {isTeacherRole ? sharePageCopy.teacherBoostIntro : sharePageCopy.studentBoostIntro}
+                </p>
+                <ul className="sharepage__boost-list">
+                  {(isTeacherRole ? sharePageCopy.teacherBoostPoints : sharePageCopy.studentBoostPoints).map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+              </section>
+
+              {note && <p className="sharepage__note">{note}</p>}
+
+              <div className="sharepage__platform-list">
+                {PLATFORMS.map(({ id }) => {
+                  const { prefix, name } = platformPrefix(id);
+                  return (
+                    <div key={id} className="sharepage__platform-row">
+                      <p className="sharepage__platform-text">
+                        {prefix}{' '}
+                        <mark className="sharepage__platform-highlight">{name}</mark>
+                      </p>
+                      <button
+                        type="button"
+                        className="sharepage__share-btn"
+                        disabled={busyPlatform === id}
+                        onClick={() => handlePlatformShare(id)}
+                      >
+                        {busyPlatform === id
+                          ? <Loader2 size={16} className="waitlist__spinner" aria-hidden />
+                          : <Share2 size={16} />}
+                        {sharePageCopy.shareButton}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           <section className="sharepage__private" aria-labelledby="share-private-title">
-            <div className="sharepage__private-head">
-              <Lock size={16} aria-hidden />
-              <h3 id="share-private-title">{sharePageCopy.privateProfileTitle}</h3>
+            <div className="sharepage__private-copy">
+              <div className="sharepage__private-head">
+                <Lock size={16} aria-hidden />
+                <h3 id="share-private-title">{sharePageCopy.privateProfileTitle}</h3>
+              </div>
+              <p>{sharePageCopy.privateProfileBody}</p>
+
+              <div className="sharepage__rules">
+                <h4>{sharePageCopy.privateProfileRulesTitle}</h4>
+                <ol>
+                  {(sharePageCopy.privateProfileRules || DEFAULT_SHARE_CAPTIONS.sharePage.privateProfileRules).map((rule) => (
+                    <li key={rule}>{rule}</li>
+                  ))}
+                </ol>
+              </div>
             </div>
-            <p>{sharePageCopy.privateProfileBody}</p>
-            <input
-              ref={screenshotInputRef}
-              type="file"
-              accept="image/jpeg,image/png,.jpg,.jpeg,.png"
-              hidden
-              onChange={handleScreenshotUpload}
-            />
-            <button
-              type="button"
-              className="sharepage__upload-btn"
-              disabled={uploadingScreenshot || screenshotUploaded}
-              onClick={() => screenshotInputRef.current?.click()}
-            >
-              {uploadingScreenshot
-                ? <Loader2 size={16} className="waitlist__spinner" aria-hidden />
-                : <Upload size={16} />}
-              {uploadingScreenshot
-                ? sharePageCopy.uploadingScreenshot
-                : screenshotUploaded
-                  ? 'Screenshot uploaded'
-                  : sharePageCopy.uploadScreenshot}
-            </button>
-            {uploadNote && (
-              <p
-                className={`sharepage__upload-note sharepage__upload-note--${uploadNoteKind || 'info'}`}
-                role="status"
-                aria-live="polite"
-              >
-                {uploadNote}
-              </p>
-            )}
+
+            <div className="sharepage__private-form-wrap">
+              <form className="sharepage__proof-form" onSubmit={handleScreenshotSubmit}>
+                <label className="sharepage__proof-field">
+                  {sharePageCopy.socialUsernameLabel}
+                  <input
+                    type="text"
+                    value={socialUsername}
+                    onChange={(e) => setSocialUsername(e.target.value)}
+                    placeholder={sharePageCopy.socialUsernamePlaceholder}
+                    disabled={uploadingScreenshot || screenshotUploaded}
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                </label>
+
+                <div className="sharepage__proof-field">
+                  <span className="sharepage__proof-label">{sharePageCopy.screenshotFileLabel}</span>
+                  <label className={`sharepage__file-picker ${screenshotFile ? 'has-file' : ''}`}>
+                    <Upload size={16} />
+                    <span>{screenshotFile ? screenshotFile.name : 'Choose screenshot (JPG or PNG)'}</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+                      hidden
+                      disabled={uploadingScreenshot || screenshotUploaded}
+                      onChange={handleScreenshotFilePick}
+                    />
+                  </label>
+                  <p className="sharepage__proof-hint">{sharePageCopy.screenshotFileHint}</p>
+                </div>
+
+                <button
+                  type="submit"
+                  className="sharepage__upload-btn"
+                  disabled={uploadingScreenshot || screenshotUploaded}
+                >
+                  {uploadingScreenshot
+                    ? <Loader2 size={16} className="waitlist__spinner" aria-hidden />
+                    : <Upload size={16} />}
+                  {uploadingScreenshot
+                    ? sharePageCopy.uploadingScreenshot
+                    : screenshotUploaded
+                      ? 'Screenshot submitted'
+                      : sharePageCopy.uploadScreenshot}
+                </button>
+              </form>
+
+              {uploadNote && (
+                <p
+                  className={`sharepage__upload-note sharepage__upload-note--${uploadNoteKind || 'info'}`}
+                  role="status"
+                  aria-live="polite"
+                >
+                  {uploadNote}
+                </p>
+              )}
+            </div>
           </section>
 
-          <p className="sharepage__admin-note">
-            <ShieldCheck size={14} /> Profile Boosts are not applied automatically — admins verify your public post (or screenshot) and waitlist ID before enabling your boost.
-          </p>
+          <div className="sharepage__footer">
+            <p className="sharepage__admin-note">
+              <ShieldCheck size={14} /> Profile Boosts are not applied automatically — admins verify your public post (or screenshot) and waitlist ID before enabling your boost.
+            </p>
 
-          <button type="button" className="sharepage__skip" onClick={() => navigate('/')}>
-            Skip for now
-          </button>
+            <button type="button" className="sharepage__skip" onClick={() => navigate('/')}>
+              Skip for now
+            </button>
+          </div>
         </div>
       </main>
       <Footer />

@@ -4,6 +4,7 @@ const FIELD_LABELS = {
   phone: 'phone number',
   country: 'country',
   city: 'city',
+  university: 'university',
   subjects: 'subjects',
   subjectIds: 'subjects',
   cnicNumber: 'CNIC number',

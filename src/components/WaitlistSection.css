@@ -200,3 +200,21 @@
   color: var(--error);
   margin-top: -2px;
 }
+
+.waitlist__form .university-select {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+.waitlist__form .university-select > input {
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  color: var(--fg);
+}

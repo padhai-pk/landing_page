@@ -177,6 +177,7 @@ export async function joinStudentWaitlist(formData) {
     phone: formData.phone,
     country: formData.country || '',
     city: formData.city || '',
+    university: formData.university || '',
     subjects: formData.subjects || [],
   });
 }
@@ -188,6 +189,7 @@ export async function joinTeacherNormalWaitlist(formData) {
     phone: formData.phone,
     country: formData.country || '',
     city: formData.city || '',
+    university: formData.university || '',
     subjects: formData.subjects || [],
     experience: formData.experience || '',
   });
@@ -241,6 +243,7 @@ export async function submitShareScreenshot({
   id,
   shareToken,
   file,
+  socialUsername = '',
   platform = 'screenshot',
 }) {
   const check = validateScreenshotFile(file);
@@ -248,11 +251,17 @@ export async function submitShareScreenshot({
     throw new Error(check.reason);
   }
 
+  const username = String(socialUsername || '').trim();
+  if (!username) {
+    throw new Error('Enter the username of the account where you posted.');
+  }
+
   const formData = new FormData();
   formData.append('collection', collectionName);
   formData.append('id', id);
   formData.append('shareToken', shareToken);
   formData.append('platform', platform);
+  formData.append('socialUsername', username);
   formData.append('file', file, file.name || 'screenshot.png');
 
   return postFormToBackend('/share-screenshot', formData);

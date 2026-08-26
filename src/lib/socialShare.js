@@ -46,7 +46,14 @@ function deepMergeCaptions(base, patch) {
     blocks: { ...base.blocks, ...patch.blocks },
     templates: { ...base.templates, ...patch.templates },
     shareMessages: { ...base.shareMessages, ...patch.shareMessages },
-    sharePage: { ...base.sharePage, ...patch.sharePage },
+    sharePage: {
+    ...base.sharePage,
+    ...patch.sharePage,
+    teacherBoostPoints: patch.sharePage?.teacherBoostPoints ?? base.sharePage?.teacherBoostPoints,
+    studentBoostPoints: patch.sharePage?.studentBoostPoints ?? base.sharePage?.studentBoostPoints,
+    privateProfileRules: patch.sharePage?.privateProfileRules ?? base.sharePage?.privateProfileRules,
+    platforms: { ...base.sharePage?.platforms, ...patch.sharePage?.platforms },
+  },
     websiteLabel: patch.websiteLabel ?? base.websiteLabel,
   };
 }

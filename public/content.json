@@ -9,6 +9,12 @@
     "instagram": "https://www.instagram.com/padhai.pk/",
     "instagram_bts": "https://www.instagram.com/padhai.pk_bts/"
   },
+  "whatsappGroups": {
+    "student": "https://chat.whatsapp.com/F1j12YlmBuBJdKkDnbCh1p?s=cl&p=a&mlu=4",
+    "teacher": "https://chat.whatsapp.com/DF7bA5ghoSkKJMyxbDiOtZ?s=cl&p=a&mlu=4",
+    "studentLabel": "Join student WhatsApp community",
+    "teacherLabel": "Join teacher WhatsApp community"
+  },
   "instagramPopup": {
     "title": "Follow along for updates",
     "main": {
@@ -100,10 +106,10 @@
   },
   "badgeProgram": {
     "eyebrow": "For teachers",
-    "heading": "2 free Verified Badge seats per subject.\nWorth Rs. 1,999 \u2014 yours for free.",
+    "heading": "2 free Verified Badge seats per subject.\nWorth Rs. 2,499 \u2014 yours for free.",
     "body": "We're earning trust before we chase traffic. The first two teachers to claim each subject get fully verified \u2014 CNIC check, qualification review, a short interview \u2014 completely free, plus a featured profile for 3 months. After these seats are gone, verification becomes a paid badge.",
     "ctaLabel": "Claim your free Verified Badge",
-    "seatValueLabel": "Rs. 1,999",
+    "seatValueLabel": "Rs. 2,499",
     "documentsRequired": [
       "CNIC \u2014 front and back (clear photo or scan)",
       "Your highest qualification certificate or degree",
@@ -127,7 +133,7 @@
     },
     {
       "q": "Is the Verified Badge really free?",
-      "a": "Yes \u2014 completely free for the first two teachers per subject. That's a Rs. 1,999 value: CNIC verification, qualification review, and a short interview, at no cost, valid for one year. We make money later through optional profile boosts \u2014 not by charging you to get verified."
+      "a": "Yes \u2014 completely free for the first two teachers per subject. That's a Rs. 2,499 value: CNIC verification, qualification review, and a short interview, at no cost, valid for one year. We make money later through optional profile boosts \u2014 not by charging you to get verified."
     },
     {
       "q": "What happens after I join the waitlist?",
@@ -186,7 +192,7 @@
   "contact": {
     "eyebrow": "Contact us",
     "heading": "Questions? We're here to help.",
-    "subtext": "Reach the Padhai.pk team by email or WhatsApp — whether you're a student, teacher, or partner.",
+    "subtext": "Reach the Padhai.pk team by email or WhatsApp — whether you're a Student, Teacher, or Parent.",
     "email": "info@padhai.pk",
     "whatsappNumber": "+923253498893",
     "whatsappDisplay": "+92 325 3498893",
@@ -194,10 +200,10 @@
     "floatLabel": "Contact Padhai"
   },
   "demoStats": {
-    "studentsCount": 184,
-    "teachersNormalCount": 67,
-    "teachersBadgeCount": 41,
-    "seatsClaimed": 41,
-    "seatsTotal": 134
+    "studentsCount": 50,
+    "teachersNormalCount": 50,
+    "teachersBadgeCount": 20,
+    "seatsClaimed": 20,
+    "seatsTotal": 20
   }
 }

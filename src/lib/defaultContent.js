@@ -14,6 +14,12 @@ export const DEFAULT_CONTENT = {
   "instagram": "https://www.instagram.com/padhai.pk/",
   "instagram_bts": "https://www.instagram.com/padhai.pk_bts/"
 },
+"whatsappGroups": {
+  "student": "https://chat.whatsapp.com/REPLACE_WITH_STUDENT_GROUP_LINK",
+  "teacher": "https://chat.whatsapp.com/REPLACE_WITH_TEACHER_GROUP_LINK",
+  "studentLabel": "Join student WhatsApp community",
+  "teacherLabel": "Join teacher WhatsApp community"
+},
 "instagramPopup": {
   "title": "Follow along for updates",
   "main": {
