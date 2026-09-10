@@ -2,6 +2,20 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "redirects": [
+    {
+      "source": "/ambassador-signup",
+      "has": [{ "type": "host", "value": "padhai.pk" }],
+      "destination": "https://ambassador.padhai.pk/",
+      "permanent": true
+    },
+    {
+      "source": "/ambassador-signup",
+      "has": [{ "type": "host", "value": "www.padhai.pk" }],
+      "destination": "https://ambassador.padhai.pk/",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],

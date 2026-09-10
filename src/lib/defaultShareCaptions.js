@@ -28,6 +28,10 @@ export const DEFAULT_SHARE_CAPTIONS = {
       headline: '✅ {fullName} applied for the Padhai.pk Verified Badge!{subjects}{waitlistId}',
       body: "\n\nAmong the first verified educators on Pakistan's new learning platform.",
     },
+    ambassador: {
+      headline: '🌟 {fullName} applied to be a Padhai.pk Student Ambassador!{subjects}{waitlistId}',
+      body: '\n\nEarn from campus referrals — apply at ambassador.padhai.pk',
+    },
     default: {
       headline: '{fullName} joined the Padhai.pk waitlist!{subjects}{waitlistId}',
       body: "\n\nBe among the first on Pakistan's new learning platform.",
@@ -70,6 +74,9 @@ export const DEFAULT_SHARE_CAPTIONS = {
     whatsappCommunityIntro: 'While you wait for launch, join our WhatsApp community for updates, tips, and early announcements.',
     uploadingScreenshot: 'Uploading…',
     uploadSuccess: 'Screenshot received! Our team will verify your post and apply your free Profile Boost.',
+    ambassadorHeadline: "You're in the running!",
+    ambassadorIntro: 'Share your ambassador card on social and mention @padhai.pk — help spread Padhai on your campus. Sharing does not unlock Profile Boost credits.',
+    ambassadorShareNote: 'Spread the word — ambassador posts are about visibility, not Profile Boost rewards.',
     platforms: {
       facebook: 'Post on Facebook',
       instagram: 'Share story on Instagram',

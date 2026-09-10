@@ -178,6 +178,8 @@ export async function joinStudentWaitlist(formData) {
     country: formData.country || '',
     city: formData.city || '',
     university: formData.university || '',
+    referralLink: formData.referralLink || '',
+    heardFrom: formData.heardFrom || '',
     subjects: formData.subjects || [],
   });
 }
@@ -190,6 +192,8 @@ export async function joinTeacherNormalWaitlist(formData) {
     country: formData.country || '',
     city: formData.city || '',
     university: formData.university || '',
+    referralLink: formData.referralLink || '',
+    heardFrom: formData.heardFrom || '',
     subjects: formData.subjects || [],
     experience: formData.experience || '',
   });
@@ -210,6 +214,26 @@ export async function joinTeacherBadgeWaitlist(formData) {
     bio: formData.bio || '',
     introVideoLink: formData.introVideoLink || '',
     documents: formData.documents || {},
+    policiesAccepted: formData.policiesAccepted || false,
+  });
+}
+
+export async function joinAmbassadorWaitlist(formData) {
+  return postToBackend('/ambassadors', {
+    name: formData.name,
+    email: formData.email,
+    phone: formData.phone,
+    country: formData.country || '',
+    city: formData.city || '',
+    educationLevel: formData.educationLevel || '',
+    institution: formData.institution || '',
+    gradeType: formData.gradeType || '',
+    gradeValue: formData.gradeValue || '',
+    instagramHandle: formData.instagramHandle || '',
+    heardFrom: formData.heardFrom || '',
+    whyAmbassador: formData.whyAmbassador || '',
+    promotionPlan: formData.promotionPlan || '',
+    reachEstimate: formData.reachEstimate || '',
     policiesAccepted: formData.policiesAccepted || false,
   });
 }

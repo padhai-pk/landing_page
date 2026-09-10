@@ -64,18 +64,21 @@ const ROLE_VIP_LABEL = {
   student: 'VIP STUDENT',
   teacher: 'VIP TEACHER',
   badge: 'VERIFIED VIP TEACHER',
+  ambassador: 'STUDENT AMBASSADOR',
 };
 
 const ROLE_LINE = {
   student: 'Student · Padhai.pk',
   teacher: 'Teacher · Padhai.pk',
   badge: 'Verified Teacher · Padhai.pk',
+  ambassador: 'Student Ambassador · Padhai.pk',
 };
 
 const ROLE_SUBJECTS_LABEL = {
   student: 'LEARNING',
   teacher: 'TEACHING',
   badge: 'TEACHING',
+  ambassador: 'CAMPUS',
 };
 
 // Perks for everyone who joins the waitlist (students & teachers alike).
@@ -91,6 +94,13 @@ const BADGE_PERKS = [
   'Free Verified Badge worth Rs. 2,000',
   'First opportunity to teach Padhai.pk\u2019s very first students',
   "Reach more students early — before the platform gets crowded with teachers",
+];
+
+const AMBASSADOR_PERKS = [
+  'Earn commission from referrals\' first-month classes & sessions — no fixed cap',
+  'Bring as many classmates as you can — every referral counts toward your earnings',
+  'Extra hampers, lifelong Padhai perks, and bonuses for more students',
+  'Get featured on Padhai social media as a campus ambassador',
 ];
 
 function loadImage(src) {
@@ -530,7 +540,8 @@ function renderCard(ctx, W, H, opts) {
   // Waitlist ID chip — kept visible so the person can quote it if needed;
   // the same id is the one saved server-side for admin review.
   if (waitlistId) {
-    const idText = `WAITLIST ID · ${waitlistId}`;
+    const idPrefix = safeRole === 'ambassador' ? 'APPLICATION ID' : 'WAITLIST ID';
+    const idText = `${idPrefix} · ${waitlistId}`;
     ctx.font = '600 20px "Space Mono", "Poppins", monospace';
     const idTextW = ctx.measureText(idText).width;
     const idIconSize = 18;
@@ -597,9 +608,17 @@ function renderCard(ctx, W, H, opts) {
     y += 40;
   }
 
-  // Perks panel — different copy for badge teachers vs everyone else
-  const perks = safeRole === 'badge' ? BADGE_PERKS : WAITLIST_PERKS;
-  const perksHeading = safeRole === 'badge' ? 'Your free Verified Badge perks' : 'Free perks for joining early';
+  // Perks panel — copy varies by role
+  const perks = safeRole === 'badge'
+    ? BADGE_PERKS
+    : safeRole === 'ambassador'
+      ? AMBASSADOR_PERKS
+      : WAITLIST_PERKS;
+  const perksHeading = safeRole === 'badge'
+    ? 'Your free Verified Badge perks'
+    : safeRole === 'ambassador'
+      ? 'Student Ambassador program'
+      : 'Free perks for joining early';
   const panelPad = 32;
   const headingH = 42;
   const lineH = 36;
@@ -639,14 +658,16 @@ function renderCard(ctx, W, H, opts) {
   // Join CTA — turns viewers of the card into new waitlist signups
   ctx.font = '500 23px "Poppins", sans-serif';
   ctx.textAlign = 'center';
-  const joinText = 'Not on Padhai.pk yet? Join the waitlist to unlock these free features too.';
+  const joinText = safeRole === 'ambassador'
+    ? 'Want to become a Padhai Student Ambassador too?'
+    : 'Not on Padhai.pk yet? Join the waitlist to unlock these free features too.';
   ctx.fillStyle = theme.textSecondary;
   const jLines = wrapLines(ctx, joinText, CW - 20);
   jLines.forEach((l, i) => ctx.fillText(l, cx, y + i * 30));
   y += jLines.length * 30 + 10;
   ctx.font = '700 24px "Poppins", sans-serif';
   ctx.fillStyle = theme.accent;
-  const ctaLabel = 'www.padhai.pk';
+  const ctaLabel = safeRole === 'ambassador' ? 'ambassador.padhai.pk' : 'www.padhai.pk';
   const ctaW = ctx.measureText(ctaLabel).width;
   ctx.fillText(ctaLabel, cx + 14, y);
   ctx.textAlign = 'left';

@@ -7,14 +7,15 @@ import {
   UserRound, Lightbulb, Unlink, FileEdit, Send, Video, Lock, BadgeCheck,
   ArrowLeftRight, PenLine, TrendingUp, Star, Landmark, Wallet,
   BookOpen, GraduationCap, Award, Users, ShieldCheck, PenTool, Sparkles,
-  School, Notebook, PencilRuler, MessageCircleQuestion, WalletIcon, Banknote
+  School, Notebook, PencilRuler, MessageCircleQuestion, WalletIcon, Banknote,
+  Gift, Link,
 } from 'lucide-react';
 
 export const ICONS = {
   UserRound, Lightbulb, Unlink, FileEdit, Send, Video, Lock, BadgeCheck, WalletIcon, Banknote,
   ArrowLeftRight, PenLine, TrendingUp, Star, Landmark, Wallet,
   BookOpen, GraduationCap, Award, Users, ShieldCheck, PenTool, Sparkles,
-  School, Notebook, PencilRuler, MessageCircleQuestion,
+  School, Notebook, PencilRuler, MessageCircleQuestion, Gift, Link,
 };
 
 // Safe lookup — falls back to Sparkles so a typo'd icon name in the JSON

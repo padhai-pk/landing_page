@@ -14,6 +14,7 @@ import {
   Lock,
 } from 'lucide-react';
 import Navbar from '../components/Navbar.jsx';
+import AmbassadorNavbar from '../components/AmbassadorNavbar.jsx';
 import Footer from '../components/Footer.jsx';
 import { drawShareCard, renderShareCardBlob } from '../lib/shareCard.js';
 import {
@@ -27,6 +28,7 @@ import { DEFAULT_SHARE_CAPTIONS } from '../lib/defaultShareCaptions.js';
 import { useContent } from '../lib/content.jsx';
 import { getFromBackend } from '../lib/backend.js';
 import { submitShareScreenshot } from '../lib/waitlist.js';
+import { isAmbassadorHost } from '../lib/hosts.js';
 import WhatsAppIcon from '../components/WhatsAppIcon.jsx';
 import './SharePage.css';
 
@@ -70,6 +72,9 @@ export default function SharePage() {
     shareToken: state?.shareToken || searchParams.get('token') || '',
   };
   const sharePageCopy = captionsConfig?.sharePage || DEFAULT_SHARE_CAPTIONS.sharePage;
+  const isAmbassadorRole = state?.role === 'ambassador';
+  const useAmbassadorShell = isAmbassadorRole || isAmbassadorHost();
+  const Nav = useAmbassadorShell ? AmbassadorNavbar : Navbar;
   const isTeacherRole = state?.role === 'teacher' || state?.role === 'badge';
   const whatsappGroupUrl = isTeacherRole
     ? content.whatsappGroups?.teacher
@@ -167,7 +172,7 @@ export default function SharePage() {
   if (loadingCard) {
     return (
       <>
-        <Navbar />
+        <Nav />
         <main className="sharepage">
           <div className="container sharepage__empty">
             <Loader2 size={28} className="waitlist__spinner" aria-hidden />
@@ -183,12 +188,14 @@ export default function SharePage() {
   if (!state) {
     return (
       <>
-        <Navbar />
+        <Nav />
         <main className="sharepage">
           <div className="container sharepage__empty">
             <h1>{loadError ? 'Could not load your card' : 'Nothing to show here yet'}</h1>
-            <p>{loadError || 'Join the waitlist first to get your shareable card.'}</p>
-            <Link to="/#waitlist" className="btn btn-primary btn-lg">Go to the waitlist</Link>
+            <p>{loadError || (useAmbassadorShell ? 'Apply to become a Student Ambassador first to get your shareable card.' : 'Join the waitlist first to get your shareable card.')}</p>
+            <Link to={useAmbassadorShell ? '/#signup' : '/#waitlist'} className="btn btn-primary btn-lg">
+              {useAmbassadorShell ? 'Apply now' : 'Go to the waitlist'}
+            </Link>
           </div>
         </main>
         <Footer />
@@ -340,12 +347,21 @@ export default function SharePage() {
 
   return (
     <>
-      <Navbar />
+      <Nav />
       <main className="sharepage">
         <div className="container sharepage__shell">
           <div className="sharepage__head">
-            <h1><PartyPopper size={22} className="sharepage__head-icon" /> You're on the list!</h1>
-            <p>Share your card and mention @padhai.pk — our team will manually verify your post and apply the free 1-month Profile Boost.</p>
+            <h1>
+              <PartyPopper size={22} className="sharepage__head-icon" />
+              {isAmbassadorRole
+                ? (sharePageCopy.ambassadorHeadline || "You're in the running!")
+                : "You're on the list!"}
+            </h1>
+            <p>
+              {isAmbassadorRole
+                ? (sharePageCopy.ambassadorIntro || sharePageCopy.ambassadorShareNote)
+                : 'Share your card and mention @padhai.pk — our team will manually verify your post and apply the free 1-month Profile Boost.'}
+            </p>
           </div>
 
           {state.role === 'badge' && state.subjectResults && (
@@ -396,8 +412,17 @@ export default function SharePage() {
                 <p className="sharepage__promo-highlight">
                   <Gift size={16} />
                   <span>
-                    <strong>Share &amp; get 1 Month FREE Profile Boost</strong>
-                    <em>Mention @padhai.pk on Facebook, Instagram or LinkedIn</em>
+                    {isAmbassadorRole ? (
+                      <>
+                        <strong>Share your ambassador card</strong>
+                        <em>{sharePageCopy.ambassadorShareNote || 'Help your campus discover Padhai.pk — mention @padhai.pk when you post.'}</em>
+                      </>
+                    ) : (
+                      <>
+                        <strong>Share &amp; get 1 Month FREE Profile Boost</strong>
+                        <em>Mention @padhai.pk on Facebook, Instagram or LinkedIn</em>
+                      </>
+                    )}
                   </span>
                 </p>
 
@@ -418,7 +443,7 @@ export default function SharePage() {
             </div>
 
             <div className="sharepage__col-actions">
-              {whatsappGroupUrl && (
+              {whatsappGroupUrl && !isAmbassadorRole && (
                 <div className="sharepage__community">
                   <p>{sharePageCopy.whatsappCommunityIntro}</p>
                   <a
@@ -433,20 +458,22 @@ export default function SharePage() {
                 </div>
               )}
 
-              <section className="sharepage__boost" aria-labelledby="share-boost-title">
-                <div className="sharepage__boost-head">
-                  <Sparkles size={18} aria-hidden />
-                  <h2 id="share-boost-title">{sharePageCopy.boostTitle}</h2>
-                </div>
-                <p className="sharepage__boost-intro">
-                  {isTeacherRole ? sharePageCopy.teacherBoostIntro : sharePageCopy.studentBoostIntro}
-                </p>
-                <ul className="sharepage__boost-list">
-                  {(isTeacherRole ? sharePageCopy.teacherBoostPoints : sharePageCopy.studentBoostPoints).map((point) => (
-                    <li key={point}>{point}</li>
-                  ))}
-                </ul>
-              </section>
+              {!isAmbassadorRole && (
+                <section className="sharepage__boost" aria-labelledby="share-boost-title">
+                  <div className="sharepage__boost-head">
+                    <Sparkles size={18} aria-hidden />
+                    <h2 id="share-boost-title">{sharePageCopy.boostTitle}</h2>
+                  </div>
+                  <p className="sharepage__boost-intro">
+                    {isTeacherRole ? sharePageCopy.teacherBoostIntro : sharePageCopy.studentBoostIntro}
+                  </p>
+                  <ul className="sharepage__boost-list">
+                    {(isTeacherRole ? sharePageCopy.teacherBoostPoints : sharePageCopy.studentBoostPoints).map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
+                  </ul>
+                </section>
+              )}
 
               {note && <p className="sharepage__note">{note}</p>}
 
@@ -477,6 +504,7 @@ export default function SharePage() {
             </div>
           </div>
 
+          {!isAmbassadorRole && (
           <section className="sharepage__private" aria-labelledby="share-private-title">
             <div className="sharepage__private-copy">
               <div className="sharepage__private-head">
@@ -553,13 +581,16 @@ export default function SharePage() {
               )}
             </div>
           </section>
+          )}
 
           <div className="sharepage__footer">
+            {!isAmbassadorRole && (
             <p className="sharepage__admin-note">
               <ShieldCheck size={14} /> Profile Boosts are not applied automatically — admins verify your public post (or screenshot) and waitlist ID before enabling your boost.
             </p>
+            )}
 
-            <button type="button" className="sharepage__skip" onClick={() => navigate('/')}>
+            <button type="button" className="sharepage__skip" onClick={() => navigate(useAmbassadorShell ? '/#signup' : '/')}>
               Skip for now
             </button>
           </div>

@@ -28,6 +28,10 @@
       "headline": " {fullName} applied for the Padhai.pk Verified Badge!{subjects}{waitlistId}",
       "body": "\n\nAmong the first verified educators on Pakistan's new learning platform."
     },
+    "ambassador": {
+      "headline": " {fullName} applied to be a Padhai.pk Student Ambassador!{subjects}{waitlistId}",
+      "body": "\n\nEarn from campus referrals — apply at ambassador.padhai.pk"
+    },
     "default": {
       "headline": "{fullName} joined the Padhai.pk waitlist!{subjects}{waitlistId}",
       "body": "\n\nBe among the first on Pakistan's new learning platform."
@@ -66,6 +70,9 @@
     "uploadScreenshot": "Submit screenshot for review",
     "uploadingScreenshot": "Uploading…",
     "uploadSuccess": "Screenshot received! Our team will verify your post and apply your free Profile Boost.",
+    "ambassadorHeadline": "You're in the running!",
+    "ambassadorIntro": "Share your ambassador card on Facebook, Instagram, or LinkedIn and mention @padhai.pk — help us spread the word on your campus. Sharing your card does not unlock Profile Boost credits (that's for waitlist members only).",
+    "ambassadorShareNote": "Spread the word — no Profile Boost for ambassador posts, just help your campus discover Padhai.pk.",
     "platforms": {
       "facebook": "Post on Facebook",
       "instagram": "Share story on Instagram",

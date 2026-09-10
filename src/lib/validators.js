@@ -29,3 +29,16 @@ export function isValidExperience(value) {
   if (value === null || value === undefined || value === '') return true; // optional
   return /^\d+$/.test(String(value).trim());
 }
+
+// Ambassador referral code format: XXX-X-XXX (e.g. ABC-1-XYZ)
+const AMBASSADOR_REFERRAL_CODE_RE = /^[A-Za-z0-9]{3}-[A-Za-z0-9]-[A-Za-z0-9]{3}$/;
+
+export function isValidAmbassadorReferralCode(value) {
+  const code = (value || '').trim();
+  if (!code) return true; // optional on waitlist signup
+  return AMBASSADOR_REFERRAL_CODE_RE.test(code);
+}
+
+export function normalizeAmbassadorReferralCode(value) {
+  return (value || '').trim().toUpperCase();
+}

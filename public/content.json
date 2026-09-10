@@ -205,5 +205,91 @@
     "teachersBadgeCount": 20,
     "seatsClaimed": 20,
     "seatsTotal": 20
+  },
+  "ambassadorProgram": {
+    "nav": {
+      "links": [
+        { "href": "#benefits", "label": "Benefits" },
+        { "href": "#how-it-works", "label": "How it works" },
+        { "href": "#signup", "label": "Apply" },
+        { "href": "#faq", "label": "FAQ" }
+      ],
+      "cta": "Apply now"
+    },
+    "hero": {
+      "eyebrow": "Student Ambassador Program",
+      "headlineLine1": "Represent Padhai in your community.",
+      "headlineLine2": "Earn from every session you bring.",
+      "subtext": "Become a Padhai Student Ambassador — whether you're in school, O/A Level, college, or university. Bring classmates onto the platform and earn commission from their classes and monthly sessions in their first month, plus hampers, bonuses, and lifelong Padhai perks."
+    },
+    "benefits": {
+      "eyebrow": "What you get",
+      "heading": "Earn money. Unlock real ambassador perks.",
+      "subtext": "No fixed caps. The more students and teachers you bring, the more you earn from their first-month sessions — plus extras that last through your student life.",
+      "items": [
+        { "icon": "Wallet", "title": "Session commissions", "text": "Earn commission from every class or monthly session your referred students and teachers take in their first whole month on Padhai — as many sessions as they book that month." },
+        { "icon": "TrendingUp", "title": "No student or earnings cap", "text": "Bring 5 or 50 from your campus — you earn from all of them. There is no limit on how many referrals you can have, and no fixed ceiling on what you can earn." },
+        { "icon": "Link", "title": "Your own referral code", "text": "Selected ambassadors get a personal code. Signups that use it are tracked to you so commissions and bonuses stay fair." },
+        { "icon": "Gift", "title": "Hampers & lifelong perks", "text": "Enjoy extra hampers and Padhai perks throughout your student life — not just during the ambassador program." },
+        { "icon": "Sparkles", "title": "Bonuses for more referrals", "text": "Bring more students and unlock extra bonuses on top of session commissions." },
+        { "icon": "Star", "title": "Featured on Padhai socials", "text": "Standout ambassadors get featured on Padhai's social media pages and help lead their campus community." }
+      ]
+    },
+    "howItWorks": {
+      "eyebrow": "How it works",
+      "heading": "From application to earning commissions",
+      "steps": [
+        { "icon": "FileEdit", "title": "Apply below", "text": "Tell us about yourself, your school or institution, and how you'd spread the word about Padhai." },
+        { "icon": "ShieldCheck", "title": "We review & select", "text": "We pick the strongest applicants — students who are active, credible, and genuinely excited about Padhai." },
+        { "icon": "Link", "title": "Get your referral code", "text": "Selected ambassadors receive a personal code. Every student or teacher who joins with it is tied to your account." },
+        { "icon": "Wallet", "title": "Earn from first-month sessions", "text": "For each referral, you earn commission on all of their classes and monthly sessions during their first month — with no fixed cap on students or earnings." }
+      ]
+    },
+    "form": {
+      "heading": "Apply to become a Student Ambassador",
+      "subtext": "Takes about two minutes. We'll email you if you're selected."
+    },
+    "policies": [
+      "I confirm all information I submit is accurate and belongs to me.",
+      "I understand the Student Ambassador program is selective — applying does not guarantee selection.",
+      "I agree to represent Padhai.pk honestly and not make false claims about the platform or commission structure.",
+      "I understand commissions and ambassador benefits apply only to students and teachers who sign up with my official ambassador referral code after I'm selected.",
+      "I agree to be contacted by the Padhai.pk team about my application and ambassador activities."
+    ],
+    "faqs": [
+      {
+        "q": "Who can become a Student Ambassador?",
+        "a": "Students at any level — school, O Level, A Level, college, or university — who use Padhai or believe in what we're building. We look for people who are active in their community, have a real network of classmates, and can explain Padhai clearly to others."
+      },
+      {
+        "q": "Do I get a referral code immediately after applying?",
+        "a": "Not right away. We review every application and select the best fits. If you're chosen, we'll email you with your personal ambassador referral code and next steps."
+      },
+      {
+        "q": "How do ambassador earnings work?",
+        "a": "You earn commission from the classes and monthly sessions your referred students and teachers take during their first whole month on Padhai. There is no fixed limit on how many people you can refer, and no fixed earnings cap — if you bring 50 classmates, you earn from all of their first-month sessions."
+      },
+      {
+        "q": "How are referrals verified?",
+        "a": "Students and teachers must sign up on Padhai.pk using your unique ambassador referral code. We track those signups to your account so commissions and bonuses are counted fairly — no manual claims needed."
+      },
+      {
+        "q": "What other perks do ambassadors get?",
+        "a": "Beyond session commissions, ambassadors get extra hampers and Padhai perks throughout their student life, bonuses for bringing more people, and a chance to be featured on Padhai's social media pages."
+      },
+      {
+        "q": "Is there a limit on how many ambassadors you select?",
+        "a": "We accept strong applicants on a rolling basis, often per city or institution. Quality matters more than quantity — we'd rather have a few great ambassadors than many inactive ones."
+      },
+      {
+        "q": "What if I'm not selected?",
+        "a": "You can still join the main Padhai waitlist at padhai.pk and use the platform when we launch. We'll keep your application on file for future ambassador rounds."
+      }
+    ],
+    "success": {
+      "title": "Application received!",
+      "body": "Thanks for applying to the Padhai Student Ambassador Program. We'll review your application and email you within a few days if you're selected. Selected ambassadors receive their personal referral code and perk details by email.",
+      "cta": "Visit padhai.pk"
+    }
   }
 }

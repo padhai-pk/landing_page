@@ -1,0 +1,96 @@
+import React, { useState, useEffect } from 'react';
+import { Menu, X, Facebook, Instagram } from 'lucide-react';
+import ThemeToggle from './ThemeToggle.jsx';
+import { useContent } from '../lib/content.jsx';
+import { useTheme } from '../lib/theme.jsx';
+import './Navbar.css';
+
+export default function AmbassadorNavbar() {
+  const content = useContent();
+  const ambassador = content.ambassadorProgram;
+  const { theme } = useTheme();
+  const logoSrc = theme === 'dark' ? content.logo.srcDark : content.logo.srcLight;
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const links = ambassador?.nav?.links || [];
+
+  return (
+    <header className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}>
+      <div className="container navbar__inner">
+        <a href="#top" className="navbar__logo">
+          <img className="navbar__logo-img" src={logoSrc} alt={content.logo.alt} />
+        </a>
+
+        <nav className="navbar__links">
+          {links.map((l) => (
+            <a key={l.href} href={l.href}>{l.label}</a>
+          ))}
+        </nav>
+
+        <div className="navbar__actions">
+          <a href={content.social.facebook} target="_blank" rel="noopener noreferrer" className="icon-btn navbar__social" aria-label="Padhai.pk on Facebook">
+            <Facebook size={16} />
+          </a>
+          <a href={content.social.instagram} target="_blank" rel="noopener noreferrer" className="icon-btn navbar__social" aria-label="Padhai.pk on Instagram">
+            <Instagram size={16} />
+          </a>
+          <ThemeToggle />
+          <a href="#signup" className="btn btn-primary btn-sm navbar__cta">
+            {ambassador?.nav?.cta || 'Apply now'}
+          </a>
+          <button
+            className="navbar__burger icon-btn"
+            aria-label="Toggle menu"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            {open ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
+      </div>
+
+      {open && (
+        <div className="navbar__mobile">
+          {links.map((l) => (
+            <a key={l.href} href={l.href} onClick={() => setOpen(false)}>{l.label}</a>
+          ))}
+          <div className="navbar__mobile-social">
+            <span className="navbar__mobile-social-label">Follow us</span>
+            <div className="navbar__mobile-social-links">
+              <a
+                href={content.social.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="navbar__mobile-social-btn"
+                aria-label="Padhai.pk on Facebook"
+                onClick={() => setOpen(false)}
+              >
+                <Facebook size={18} />
+              </a>
+              <a
+                href={content.social.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="navbar__mobile-social-btn"
+                aria-label="Padhai.pk on Instagram"
+                onClick={() => setOpen(false)}
+              >
+                <Instagram size={18} />
+              </a>
+            </div>
+          </div>
+          <a href="#signup" className="btn btn-primary btn-md" onClick={() => setOpen(false)}>
+            {ambassador?.nav?.cta || 'Apply now'}
+          </a>
+        </div>
+      )}
+    </header>
+  );
+}

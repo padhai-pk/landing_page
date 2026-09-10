@@ -12,14 +12,25 @@ import { SUBJECTS, CATEGORIES } from '../lib/subjects.js';
 import { joinStudentWaitlist, joinTeacherNormalWaitlist } from '../lib/waitlist.js';
 import { getUserFacingError } from '../lib/apiErrors.js';
 import { useNavigate } from 'react-router-dom';
-import { isValidEmail, isValidExperience } from '../lib/validators.js';
+import { isValidEmail, isValidExperience, isValidAmbassadorReferralCode, normalizeAmbassadorReferralCode } from '../lib/validators.js';
+import { HEARD_ABOUT_OPTIONS } from '../lib/heardAbout.js';
 
 const TABS = [
   { id: 'student', label: 'Join as student', icon: <Users size={16} /> },
   { id: 'teacher', label: 'Join as teacher', icon: <GraduationCap size={16} /> },
 ];
 
-const emptyForm = { name: '', email: '', phone: '', country: '', city: '', university: '', experience: '' };
+const emptyForm = {
+  name: '',
+  email: '',
+  phone: '',
+  country: '',
+  city: '',
+  university: '',
+  experience: '',
+  referralLink: '',
+  heardFrom: '',
+};
 export default function WaitlistSection({ subjects, onResult, activeTab, onTabChange }) {
   const content = useContent();
   const navigate = useNavigate();
@@ -86,15 +97,28 @@ export default function WaitlistSection({ subjects, onResult, activeTab, onTabCh
       setError('Pick at least one subject.');
       return;
     }
+    if (!form.heardFrom) {
+      setError('Please tell us how you heard about Padhai.');
+      return;
+    }
+    if (!isValidAmbassadorReferralCode(form.referralLink)) {
+      setError('Ambassador referral code must look like XXX-X-XXX (e.g. ABC-1-XYZ).');
+      return;
+    }
     const subjectNames = subjectList.filter((s) => chosenSubjects.includes(s.id)).map((s) => s.name);
+    const payload = {
+      ...form,
+      referralLink: normalizeAmbassadorReferralCode(form.referralLink),
+      subjects: chosenSubjects,
+    };
 
     setSubmitting(true);
     try {
       if (tab === 'student') {
-        const { id, shareToken } = await joinStudentWaitlist({ ...form, subjects: chosenSubjects });
+        const { id, shareToken } = await joinStudentWaitlist(payload);
         navigate('/share', { state: { role: 'student', name: form.name, id, shareToken, collection: 'waitlistStudents', subjects: subjectNames } });
       } else {
-        const { id, shareToken } = await joinTeacherNormalWaitlist({ ...form, subjects: chosenSubjects });
+        const { id, shareToken } = await joinTeacherNormalWaitlist(payload);
         navigate('/share', { state: { role: 'teacher', name: form.name, id, shareToken, collection: 'waitlistTeachersNormal', subjects: subjectNames } });
       }
     } catch (err) {
@@ -217,6 +241,33 @@ export default function WaitlistSection({ subjects, onResult, activeTab, onTabCh
                   />
                 </label>
               )}
+
+              <label className="waitlist__full">
+                How did you hear about us?
+                <select
+                  value={form.heardFrom}
+                  onChange={(e) => update('heardFrom', e.target.value)}
+                  required
+                >
+                  <option value="">Select an option</option>
+                  {HEARD_ABOUT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="waitlist__full">
+                Ambassador referral code (optional)
+                <input
+                  type="text"
+                  value={form.referralLink}
+                  onChange={(e) => update('referralLink', e.target.value.toUpperCase())}
+                  placeholder="XXX-X-XXX"
+                  maxLength={9}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+              </label>
 
               {error && <p className="waitlist__error" role="alert">{error}</p>}
 
