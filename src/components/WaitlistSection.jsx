@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GraduationCap, Users, Award, Loader2, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { GraduationCap, Users, Loader2 } from 'lucide-react';
 import Reveal from './Reveal.jsx';
 import SubjectPicker from './SubjectPicker.jsx';
 import CountryCitySelect from './CountryCitySelect.jsx';
@@ -158,19 +157,6 @@ export default function WaitlistSection({ subjects, onResult, activeTab, onTabCh
                 </button>
               ))}
             </div>
-
-            {tab === 'teacher' && (
-              <div className="waitlist__badge-promo">
-                <span className="waitlist__badge-promo-icon"><Award size={20} /></span>
-                <div className="waitlist__badge-promo-text">
-                  <strong>Verified Badges are free for the first teachers on each subject.</strong>
-                  <p>{content.badgeProgram.body}</p>
-                </div>
-                <Link to="/badge-application" className="btn btn-secondary-outline btn-sm waitlist__badge-promo-btn">
-                  Claim a free badge <ArrowRight size={15} />
-                </Link>
-              </div>
-            )}
 
             <form onSubmit={handleSubmit} className="waitlist__form">
               <div className="waitlist__row">
